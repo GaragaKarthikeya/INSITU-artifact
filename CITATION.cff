@@ -3,6 +3,7 @@ message: "Please cite this software when using the INSITU implementation or eval
 type: software
 title: "INSITU: Reconstruction-Free Attention over a Compressed KV Cache on FPGA"
 version: 1.0.0
+doi: 10.5281/zenodo.23510637
 license: MIT
 repository-code: "https://github.com/GaragaKarthikeya/INSITU-artifact"
 authors:

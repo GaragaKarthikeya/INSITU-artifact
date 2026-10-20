@@ -1,5 +1,7 @@
 # INSITU
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23510637.svg)](https://doi.org/10.5281/zenodo.23510637)
+
 **Reconstruction-Free Attention over a Compressed KV Cache on FPGA**
 
 INSITU computes attention directly from quantized cache codes on a Xilinx
@@ -95,6 +97,8 @@ numerical correctness at context 32,768.
 ## Citation and license
 
 MIT licensed. `CITATION.cff` and `.zenodo.json` name the paper's three authors.
-The Zenodo DOI is assigned when this repository's release is archived;
-no DOI has been invented in this source tree. See
-[docs/release.md](docs/release.md) for the GitHub–Zenodo sequence.
+Version 1.0.0 is archived at
+[10.5281/zenodo.23510637](https://doi.org/10.5281/zenodo.23510637).
+The all-versions DOI is
+[10.5281/zenodo.23510636](https://doi.org/10.5281/zenodo.23510636).
+See [docs/release.md](docs/release.md) for the GitHub–Zenodo sequence.
