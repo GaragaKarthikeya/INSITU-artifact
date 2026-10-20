@@ -1,0 +1,14 @@
+=== Perplexity with every layer's attention on the ZCU104 ===
+256 tokens of WikiText-2, Llama 3.2 1B, no prefill, all rows hardware-written
+
+baseline (fp32 attention, host)      perplexity   11.279
+compressed 4b/2b, FPGA               perplexity   14.102
+                                     ratio        1.2503
+
+256 tokens in 336.1 s (1313 ms/token wall)
+decode steps on the FPGA: 4096 (16 layers x 256 tokens)
+  agreement with the host: 4096 exact, 0 different
+  device time: 107.5 ms total, 26 us/step
+  wire time:   6693 ms total, 1.6 ms/step (1.6% of it is the block)
+  scan: 7912669 cycles, 322404 starving (4.07%)
+  clips 0, overflows 0, steps with a range/saturation flag 0

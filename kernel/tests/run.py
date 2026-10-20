@@ -1,0 +1,26 @@
+"""Run every check. `python -m kernel.tests.run [pattern]`"""
+
+import sys
+
+from .harness import run
+
+MODULES = [
+    "kernel.tests.test_numerics",
+    "kernel.tests.test_codebook",
+    "kernel.tests.test_rotation",
+    "kernel.tests.test_quantize",
+    "kernel.tests.test_attention",
+    "kernel.tests.test_score_paths",
+    "kernel.tests.test_rope_scaling",
+    "kernel.tests.test_kernel",
+    "kernel.tests.test_hardware",
+    "kernel.tests.test_vectors",
+    "kernel.tests.test_ddr_layout",
+    "kernel.tests.test_board_vectors",
+    "kernel.tests.test_proto",
+    "kernel.tests.test_adapter",
+]
+
+if __name__ == "__main__":
+    pat = sys.argv[1] if len(sys.argv) > 1 else ""
+    sys.exit(run([m for m in MODULES if pat in m]))

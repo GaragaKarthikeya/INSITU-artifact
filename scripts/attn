@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Run INSITU tools from any working directory. Program the board explicitly
+# with `xsdb host/run_attn_server.tcl` before using this wrapper.
+set -euo pipefail
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
+PYTHON="${INSITU_PYTHON:-python3}"
+BOARD_IP="${BOARD_IP:-192.168.10.2}"
+IFACE="${IFACE:-eth0}"
+cd "$ROOT"
+if [ -n "${VITIS_SETTINGS:-}" ]; then source "$VITIS_SETTINGS"; fi
+cmd="${1:-}"
+if [ "$#" -gt 0 ]; then shift; fi
+case "$cmd" in
+  infer) mod=kernel.experiments.fpga_infer; args=(--udp "$BOARD_IP") ;;
+  ppl) mod=kernel.experiments.fpga_ppl; args=(--udp "$BOARD_IP") ;;
+  diff) mod=kernel.experiments.cache_diff; args=() ;;
+  probe) mod=kernel.host.eth_probe; args=(--eth "$IFACE") ;;
+  reset) exec xsdb host/run_attn_server.tcl ;;
+  *) echo "usage: $0 {infer|ppl|diff|probe|reset} [arguments]" >&2; exit 2 ;;
+esac
+for a in "$@"; do
+  case "$a" in --cpu-only|--jtag|--eth|--udp) args=() ;; esac
+done
+exec "$PYTHON" -m "$mod" "${args[@]}" "$@"

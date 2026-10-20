@@ -1,0 +1,27 @@
+# Live-activation bit-exactness at ctx 1,024. Transcribed from the terminal.
+#
+#   ./scripts/attn ppl --tokens 1024        (verify ON -- no --no-verify)
+#
+# Replaces the previous live figure of 4,096 steps to ctx 256. The datapath is
+# separately checked at ctx 64/256/1,024/8,192 on synthetic vectors
+# (results/step14_dma_f250.log).
+
+========================================================================
+baseline (fp32 attention, host)      perplexity    5.981
+compressed 4b/2b, FPGA                perplexity    7.256
+                                     ratio        1.2132
+========================================================================
+1024 tokens in 2260.8 s (2208 ms/token wall)
+decode steps on the FPGA: 16384 (16 layers x 1024 tokens)
+  agreement with the host: 16384 exact, 0 different
+  device time: 652.8 ms total, 40 us/step
+  wire time:   19982 ms total, 1.2 ms/step (3.3% of it is the block)
+  scan: 87381094 cycles, 2017624 starving (2.31%)
+  clips 0, overflows 0, steps with a range/saturation flag 0
+
+# Derived:
+#   rows scanned  67,174,400  (16 layers x 8 heads x sum 1..1024)
+#   cyc/row       1.301       at a mean context of 512
+#   scan time     0.350 s at 250 MHz = 54% of device time
+#   per token     2,188 ms host (99.1%), 19.5 ms wire, 0.64 ms device
+#   the check costs: 2,208 ms/token here vs 427 ms/token at ctx 4,096 without it

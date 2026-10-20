@@ -1,0 +1,11 @@
+Validated 51 configurations, 12 windows each; baseline 9.3895
+2/2  288 B/token/layer  perplexity 103.3080
+3/2  352 B/token/layer  perplexity 14.6055
+4/2  416 B/token/layer  perplexity 11.1043
+4/3  480 B/token/layer  perplexity 10.1830
+5/3  544 B/token/layer  perplexity 9.7362
+5/4  608 B/token/layer  perplexity 9.5808
+6/4  672 B/token/layer  perplexity 9.4822
+6/5  736 B/token/layer  perplexity 9.4505
+6/6  800 B/token/layer  perplexity 9.4381
+Wrote figure and CSV to /home/digital3/kernel/release/INSITU/results/generated

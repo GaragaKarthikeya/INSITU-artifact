@@ -1,0 +1,64 @@
+--- tb_ddr_probe
+      outstanding=1  : 6849 cyc  (0.598 beats/cyc)
+      outstanding=16 : 4266 cyc  (0.960 beats/cyc)
+      4 ports        : 4266 cyc  (3.841 beats/cyc aggregate)
+    === tb_ddr_probe: ALL TESTS PASSED ===
+    tb/tb_ddr_probe.sv:268: $finish called at 94860000 (1ps)
+--- tb_rot
+    === tb_rot: ALL TESTS PASSED ===
+    tb/tb_rot.sv:130: $finish called at 4372000 (1ps)
+--- tb_rot_norm
+    === tb_rot_norm: ALL TESTS PASSED ===
+    tb/tb_rot_norm.sv:100: $finish called at 20456000 (1ps)
+--- tb_rot_encode
+      560 vectors, of which the last 32 sit on a boundary
+    === tb_rot_encode: ALL TESTS PASSED ===
+    tb/tb_rot_encode.sv:118: $finish called at 31376000 (1ps)
+--- tb_qtab_build
+      32 heads x 64 channels x 16 codes = 32768 entries checked
+    === tb_qtab_build: ALL TESTS PASSED ===
+    tb/tb_qtab_build.sv:138: $finish called at 12816000 (1ps)
+--- tb_score_lane
+      32 heads x 65 tokens = 2080 scores + 5 edge rows; 239 stalls
+    === tb_score_lane: ALL TESTS PASSED ===
+    tb/tb_score_lane.sv:211: $finish called at 19344000 (1ps)
+--- tb_exp_lut
+      13565 deltas, 11740 of them non-zero, 3-cycle pipe at II=1
+    === tb_exp_lut: ALL TESTS PASSED ===
+    tb/tb_exp_lut.sv:78: $finish called at 54286000 (1ps)
+--- tb_softmax_accum
+      replayed 68 ops at full rate, 10 cycles of SCALE-behind-add
+      2 stimulus sets x 4 lanes x 65 tokens, FIFO high-water 32 of 32
+      19 distinct rescale factors applied
+      40 rescale events: 400 cycles growing, 70 folding in accum
+      scan bubbles 594 cycles, 14 per rescale (model charges 1)
+    === tb_softmax_accum: ALL TESTS PASSED ===
+    tb/tb_softmax_accum.sv:332: $finish called at 5372000 (1ps)
+--- tb_finalize
+      49 rows (32 real, 17 constructed), 22..54 cycles
+      shifts 16..62, reciprocals all 32 b; 7 rows exceeded the 24-bit seam
+    === tb_finalize: ALL TESTS PASSED ===
+    tb/tb_finalize.sv:160: $finish called at 11058000 (1ps)
+--- tb_kv_store
+      8 heads x 65 rows, last scan 109 cycles (65 tokens)
+      starve cycles 352 total
+      long scan: 1024 rows in 1024 cycles after the first (44 starve)
+      round trip: 40 rows written and read back through AXI
+      non-uniform layout: 64 rows of 44 B at widths 16/8/16/4
+    === tb_kv_store: ALL TESTS PASSED ===
+    tb/tb_kv_store.sv:487: $finish called at 18764000 (1ps)
+--- tb_attn
+      32 heads x 64 channels in 4372 cycles (520 rows scanned)
+      starve 44, clips 0, overflows 0, range_error 0, norm_sat 0
+      scan 1880 cycles, busy 4372 (bench measured 4372)
+      write bytes masked: 2048 of 2048 channels differ
+      stalled run: 4400 cycles against 4372 clean, starve 51
+    === tb_attn: ALL TESTS PASSED ===
+    tb/tb_attn.sv:356: $finish called at 70108000 (1ps)
+--- tb_attn_ctrl
+      32 heads read back over AXI-Lite, 1676 polls, 44 starve cycles
+      scan 1880 cycles, busy 6700
+      stream mode: 144 beats in, 96 out, identical to the buffered step
+    === tb_attn_ctrl: ALL TESTS PASSED ===
+    tb/tb_attn_ctrl.sv:458: $finish called at 169276000 (1ps)
+=== regress: all benches passed

@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "insitu-attention"
+version = "1.0.0"
+description = "Reconstruction-free attention over a compressed KV cache on FPGA"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+  {name = "Karthikeya Garaga"},
+  {name = "Lohith Prapoorna Chandra Gonuguntla"},
+  {name = "Madhav Rao"},
+]
+dependencies = ["numpy>=1.24"]
+
+[project.optional-dependencies]
+evaluation = ["torch>=2", "transformers>=5,<6", "datasets>=3", "matplotlib>=3.8"]
+
+[project.urls]
+Repository = "https://github.com/GaragaKarthikeya/INSITU-artifact"
+
+[tool.setuptools.packages.find]
+include = ["kernel", "kernel.*"]
+
+[tool.setuptools.package-data]
+"kernel.host" = ["*.h"]

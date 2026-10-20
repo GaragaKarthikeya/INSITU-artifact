@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+models/
+.Xil/
+*.jou
+vivado*.log
+clockInfo.txt
+cong/
+iter_*_CongestedCLBsAndNets.txt
+sw/attn_vectors.c
+sw/attn_vectors.h
+results/generated/
+results/rerun-*/

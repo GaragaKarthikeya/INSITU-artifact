@@ -1,0 +1,28 @@
+=== ZCU104 attention block, driven by the A53 (step 13) ===
+MAGIC ok (A77E0001), shim windows 2304 in / 1536 out words
+DDR round trip ok at 10000000
+--- ctx64: 64 cached tokens, 4 steps, image 131072 B (stride 16384, span 4096)
+  step 0  ctx   65  ok   scan   2030 cyc  busy   8293 cyc  3330 MB/s  starve   64  clips 0  ovf 0  load 127 us  run  33 us  read 239 us
+  step 1  ctx   66  ok   scan   2116 cyc  busy   8370 cyc  3243 MB/s  starve   64  clips 0  ovf 0  load 128 us  run  34 us  read 239 us
+  step 2  ctx   67  ok   scan   2025 cyc  busy   8277 cyc  3440 MB/s  starve   64  clips 0  ovf 0  load 128 us  run  34 us  read 239 us
+  step 3  ctx   68  ok   scan   2072 cyc  busy   8326 cyc  3413 MB/s  starve   64  clips 0  ovf 0  load 128 us  run  34 us  read 239 us
+  ctx64 TOTAL: 2128 rows, 8243 scan cyc (3.87 cyc/row), 3356 MB/s, PL clock ~246 MHz
+  ctx64 TIME:  load 511 us, run 135 us, read 956 us over 4 steps
+  ctx64 DDR:   starve 256 of 8243 scan cycles (3.1% of the scan)
+--- ctx256: 256 cached tokens, 4 steps, image 262144 B (stride 32768, span 8192)
+  step 0  ctx  257  ok   scan   3763 cyc  busy  10010 cyc  7102 MB/s  starve   70  clips 0  ovf 0  load 128 us  run  40 us  read 239 us
+  step 1  ctx  258  ok   scan   3687 cyc  busy   9934 cyc  7277 MB/s  starve   70  clips 0  ovf 0  load 128 us  run  40 us  read 239 us
+  step 2  ctx  259  ok   scan   3999 cyc  busy  10251 cyc  6735 MB/s  starve   70  clips 0  ovf 0  load 127 us  run  42 us  read 239 us
+  step 3  ctx  260  ok   scan   3739 cyc  busy   9988 cyc  7231 MB/s  starve   70  clips 0  ovf 0  load 127 us  run  41 us  read 239 us
+  ctx256 TOTAL: 8272 rows, 15188 scan cyc (1.83 cyc/row), 7080 MB/s, PL clock ~246 MHz
+  ctx256 TIME:  load 510 us, run 163 us, read 956 us over 4 steps
+  ctx256 DDR:   starve 280 of 15188 scan cycles (1.8% of the scan)
+--- ctx1024: 1024 cached tokens, 4 steps, image 655360 B (stride 81920, span 20480)
+  step 0  ctx 1025  ok   scan  10354 cyc  busy  16617 cyc  10295 MB/s  starve   76  clips 0  ovf 0  load 127 us  run  66 us  read 239 us
+  step 1  ctx 1026  ok   scan  10250 cyc  busy  16504 cyc  10410 MB/s  starve   75  clips 0  ovf 0  load 127 us  run  67 us  read 239 us
+  step 2  ctx 1027  ok   scan  10208 cyc  busy  16466 cyc  10463 MB/s  starve   75  clips 0  ovf 0  load 127 us  run  67 us  read 239 us
+  step 3  ctx 1028  ok   scan  10196 cyc  busy  16450 cyc  10485 MB/s  starve  101  clips 0  ovf 0  load 128 us  run  67 us  read 239 us
+  ctx1024 TOTAL: 32848 rows, 41008 scan cyc (1.24 cyc/row), 10413 MB/s, PL clock ~247 MHz
+  ctx1024 TIME:  load 509 us, run 267 us, read 956 us over 4 steps
+  ctx1024 DDR:   starve 327 of 41008 scan cycles (0.7% of the scan)
+=== ALL TESTS PASSED ===

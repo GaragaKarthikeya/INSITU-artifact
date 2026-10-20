@@ -1,0 +1,13 @@
+=== long-context probe: address pattern only (PRNG cache, answers not checked) ===
+--- probe8192  [span 135168, stride 540672, image 4224 KB]
+  probe8192  TOTAL: 1.16 cyc/row, 11116 MB/s, starve 1.7% of the scan, 165.7 cyc/group, 0.0202 cyc/row
+--- probe16384 [span 266240, stride 1064960, image 8320 KB]
+  probe16384 TOTAL: 1.15 cyc/row, 11273 MB/s, starve 1.6% of the scan, 302.6 cyc/group, 0.0184 cyc/row
+--- probe32768 [span 528384, stride 2113536, image 16512 KB]
+  step 0  ctx  32769  scan  300510 cyc  11340 MB/s  starve  4771  run  1220 us
+  step 1  ctx  32770  scan  301027 cyc  11321 MB/s  starve  4891  run  1223 us
+  step 2  ctx  32771  scan  300796 cyc  11330 MB/s  starve  4855  run  1222 us
+  step 3  ctx  32772  scan  300705 cyc  11334 MB/s  starve  4719  run  1221 us
+  probe32768 TOTAL: 1.14 cyc/row, 11331 MB/s, starve 1.5% of the scan, 601.1 cyc/group, 0.0183 cyc/row
+CONTROL: probe8192 against the bit-exact ctx8192 DMA run
+  cyc/row 1.16 vs 1.17   MB/s 11116 vs 11090   starve/step 1326 vs 1279

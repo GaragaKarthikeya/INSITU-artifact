@@ -1,0 +1,45 @@
+=== ZCU104 attention block, driven by the A53 (step 13/14, DMA build) ===
+MAGIC ok (A77E0001), shim windows 2304 in / 1536 out words
+DDR round trip ok at 10000000
+DMA ready at A0100000
+--- ctx64 [AXI-Lite]: 64 cached tokens, 4 steps, image 131072 B (stride 16384, span 4096)
+  ctx64 TOTAL: 2128 rows, 8233 scan cyc (3.86 cyc/row), 3360 MB/s, PL clock ~247 MHz
+  ctx64 TIME:  load 511 us, run 135 us, read 956 us over 4 steps
+  ctx64 DDR:   starve 256 of 8233 scan cycles (3.1% of the scan)
+--- ctx64 [DMA]
+  ctx64 TOTAL: 2128 rows, 8405 scan cyc (3.94 cyc/row), 3291 MB/s, PL clock ~226 MHz
+  ctx64 TIME:  load 12 us, run 108 us, read 0 us over 4 steps
+  ctx64 DDR:   starve 292 of 8405 scan cycles (3.4% of the scan)
+--- ctx256 [AXI-Lite]
+  ctx256 TOTAL: 8272 rows, 15257 scan cyc (1.84 cyc/row), 7048 MB/s, PL clock ~246 MHz
+  ctx256 TIME:  load 510 us, run 164 us, read 956 us over 4 steps
+  ctx256 DDR:   starve 280 of 15257 scan cycles (1.8% of the scan)
+--- ctx256 [DMA]
+  ctx256 TOTAL: 8272 rows, 15244 scan cyc (1.84 cyc/row), 7054 MB/s, PL clock ~233 MHz
+  ctx256 TIME:  load 12 us, run 134 us, read 0 us over 4 steps
+  ctx256 DDR:   starve 292 of 15244 scan cycles (1.9% of the scan)
+--- ctx1024 [AXI-Lite]
+  ctx1024 TOTAL: 32848 rows, 40993 scan cyc (1.24 cyc/row), 10416 MB/s, PL clock ~247 MHz
+  ctx1024 TIME:  load 510 us, run 267 us, read 956 us over 4 steps
+  ctx1024 DDR:   starve 308 of 40993 scan cycles (0.7% of the scan)
+--- ctx1024 [DMA]
+  ctx1024 TOTAL: 32848 rows, 41134 scan cyc (1.25 cyc/row), 10381 MB/s, PL clock ~240 MHz
+  ctx1024 TIME:  load 18 us, run 238 us, read 0 us over 4 steps
+  ctx1024 DDR:   starve 386 of 41134 scan cycles (0.9% of the scan)
+--- ctx8192 [AXI-Lite]: 8192 cached tokens, 4 steps, image 4325376 B (stride 540672, span 135168)
+  step 0  ctx 8193  ok   scan  76633 cyc  busy  82913 cyc  11118 MB/s  starve 1224  clips 0  ovf 0  load 128 us  run 332 us  read 239 us
+  step 1  ctx 8194  ok   scan  76881 cyc  busy  83154 cyc  11084 MB/s  starve 1286  clips 0  ovf 0  load 127 us  run 333 us  read 239 us
+  step 2  ctx 8195  ok   scan  76757 cyc  busy  83029 cyc  11103 MB/s  starve 1284  clips 0  ovf 0  load 128 us  run 333 us  read 239 us
+  step 3  ctx 8196  ok   scan  76443 cyc  busy  82721 cyc  11150 MB/s  starve 1149  clips 0  ovf 0  load 128 us  run 332 us  read 239 us
+  ctx8192 TOTAL: 262224 rows, 306714 scan cyc (1.16 cyc/row), 11114 MB/s, PL clock ~249 MHz
+  ctx8192 TIME:  load 511 us, run 1330 us, read 956 us over 4 steps
+  ctx8192 DDR:   starve 4943 of 306714 scan cycles (1.6% of the scan)
+--- ctx8192 [DMA]
+  step 0  ctx 8193  ok   scan  76699 cyc  busy  80724 cyc  11109 MB/s  starve 1254  clips 0  ovf 0  load   5 us  run 325 us  read   0 us
+  step 1  ctx 8194  ok   scan  76613 cyc  busy  80636 cyc  11123 MB/s  starve 1300  clips 0  ovf 0  load   4 us  run 325 us  read   0 us
+  step 2  ctx 8195  ok   scan  76443 cyc  busy  80470 cyc  11149 MB/s  starve 1276  clips 0  ovf 0  load   5 us  run 324 us  read   0 us
+  step 3  ctx 8196  ok   scan  76668 cyc  busy  80692 cyc  11117 MB/s  starve 1228  clips 0  ovf 0  load   7 us  run 325 us  read   0 us
+  ctx8192 TOTAL: 262224 rows, 306423 scan cyc (1.16 cyc/row), 11124 MB/s, PL clock ~248 MHz
+  ctx8192 TIME:  load 21 us, run 1299 us, read 0 us over 4 steps
+  ctx8192 DDR:   starve 5058 of 306423 scan cycles (1.6% of the scan)
+=== ALL TESTS PASSED ===

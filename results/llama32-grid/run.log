@@ -1,0 +1,725 @@
+[transformers] Token indices sequence length is longer than the specified maximum sequence length for this model (289077 > 131072). Running this sequence through the model will result in indexing errors
+Loading weights:   0%|          | 0/146 [00:00<?, ?it/s]Loading weights:   1%|          | 1/146 [00:00<00:16,  8.72it/s]Loading weights:  84%|████████▍ | 123/146 [00:00<00:00, 674.96it/s]Loading weights: 100%|██████████| 146/146 [00:00<00:00, 617.56it/s]
+corpus  289,077 tokens -> 12 windows of 2048
+model   /home/digital3/kernel/models/Llama-3.2-1B  16L 32H 8KV d64 float32
+
+baseline  w  1/12  ppl   7.2566     1.0s  ETA  1.20 h
+baseline  w  2/12  ppl   9.8280     0.7s  ETA  0.66 h
+k2v2-A    w  1/12  ppl  96.8640   520.4s  ETA 29.97 h  sat 0.00e+00 max|x| 28.822
+k2v2-A    w  2/12  ppl 106.6118   518.8s  ETA 44.35 h  sat 0.00e+00 max|x| 28.822
+k2v2-B    w  1/12  ppl  88.5002    63.0s  ETA 37.65 h  sat 0.00e+00 max|x| 29.964
+k2v2-B    w  2/12  ppl 101.1688    61.3s  ETA 33.05 h  sat 0.00e+00 max|x| 29.964
+k2v3-A    w  1/12  ppl  74.7636   513.8s  ETA 40.69 h  sat 0.00e+00 max|x| 28.291
+k2v3-A    w  2/12  ppl  90.1481   514.5s  ETA 46.34 h  sat 0.00e+00 max|x| 28.291
+k2v3-B    w  1/12  ppl  81.1841    78.2s  ETA 42.63 h  sat 0.00e+00 max|x| 28.211
+k2v3-B    w  2/12  ppl  97.9454    78.1s  ETA 39.61 h  sat 0.00e+00 max|x| 30.183
+k2v4-A    w  1/12  ppl  75.2018   516.0s  ETA 43.83 h  sat 0.00e+00 max|x| 25.974
+k2v4-A    w  2/12  ppl  76.5888   516.9s  ETA 47.29 h  sat 0.00e+00 max|x| 28.092
+k2v4-B    w  1/12  ppl  70.4150    99.3s  ETA 44.89 h  sat 0.00e+00 max|x| 27.563
+k2v4-B    w  2/12  ppl  78.3508   100.3s  ETA 42.81 h  sat 0.00e+00 max|x| 27.563
+k2v5-A    w  1/12  ppl  64.6808   518.2s  ETA 45.65 h  sat 0.00e+00 max|x| 28.481
+k2v5-A    w  2/12  ppl  77.9049   517.1s  ETA 48.07 h  sat 0.00e+00 max|x| 28.481
+k2v5-B    w  1/12  ppl  65.0101   141.8s  ETA 46.58 h  sat 0.00e+00 max|x| 27.841
+k2v5-B    w  2/12  ppl  77.0391   143.6s  ETA 45.23 h  sat 0.00e+00 max|x| 29.674
+k2v6-A    w  1/12  ppl  69.9242   520.2s  ETA 47.32 h  sat 0.00e+00 max|x| 27.928
+k2v6-A    w  2/12  ppl  72.2972   518.7s  ETA 49.14 h  sat 0.00e+00 max|x| 27.928
+k2v6-B    w  1/12  ppl  67.5286   266.8s  ETA 48.83 h  sat 0.00e+00 max|x| 29.143
+k2v6-B    w  2/12  ppl  70.9029   266.9s  ETA 48.52 h  sat 0.00e+00 max|x| 29.143
+k3v2-A    w  1/12  ppl  11.9153   513.2s  ETA 50.01 h  sat 0.00e+00 max|x| 24.893
+k3v2-A    w  2/12  ppl  15.5060   510.1s  ETA 51.31 h  sat 0.00e+00 max|x| 25.066
+k3v2-B    w  1/12  ppl  11.7845    56.2s  ETA 49.56 h  sat 0.00e+00 max|x| 26.156
+k3v2-B    w  2/12  ppl  15.3251    56.4s  ETA 47.93 h  sat 0.00e+00 max|x| 26.156
+k3v3-A    w  1/12  ppl  10.3830   509.6s  ETA 49.16 h  sat 0.00e+00 max|x| 30.479
+k3v3-A    w  2/12  ppl  13.8718   504.2s  ETA 50.25 h  sat 0.00e+00 max|x| 30.479
+k3v3-B    w  1/12  ppl  10.3897    76.8s  ETA 48.88 h  sat 0.00e+00 max|x| 26.614
+k3v3-B    w  2/12  ppl  13.9431    76.0s  ETA 47.58 h  sat 0.00e+00 max|x| 26.614
+k3v4-A    w  1/12  ppl   9.9350   523.9s  ETA 48.71 h  sat 0.00e+00 max|x| 26.016
+k3v4-A    w  2/12  ppl  13.5718   523.8s  ETA 49.74 h  sat 0.00e+00 max|x| 26.016
+k3v4-B    w  1/12  ppl  10.0216    98.4s  ETA 48.64 h  sat 0.00e+00 max|x| 28.708
+k3v4-B    w  2/12  ppl  13.5057   100.0s  ETA 47.60 h  sat 0.00e+00 max|x| 28.708
+k3v5-A    w  1/12  ppl   9.6082   522.7s  ETA 48.57 h  sat 0.00e+00 max|x| 25.125
+k3v5-A    w  2/12  ppl  13.0325   522.8s  ETA 49.46 h  sat 0.00e+00 max|x| 25.125
+k3v5-B    w  1/12  ppl   9.7848   154.1s  ETA 48.72 h  sat 0.00e+00 max|x| 27.036
+k3v5-B    w  2/12  ppl  13.0766   153.4s  ETA 48.00 h  sat 0.00e+00 max|x| 27.036
+k3v6-A    w  1/12  ppl   9.6312   519.5s  ETA 48.82 h  sat 0.00e+00 max|x| 26.479
+k3v6-A    w  2/12  ppl  13.0269   516.8s  ETA 49.57 h  sat 0.00e+00 max|x| 26.479
+k3v6-B    w  1/12  ppl   9.9416   289.7s  ETA 49.41 h  sat 0.00e+00 max|x| 26.740
+k3v6-B    w  2/12  ppl  13.2898   301.0s  ETA 49.28 h  sat 0.00e+00 max|x| 26.740
+k4v2-A    w  1/12  ppl   8.6089   528.1s  ETA 50.01 h  sat 0.00e+00 max|x| 23.930
+k4v2-A    w  2/12  ppl  11.4779   528.2s  ETA 50.68 h  sat 0.00e+00 max|x| 25.290
+k4v2-B    w  1/12  ppl   8.6866    49.9s  ETA 49.65 h  sat 0.00e+00 max|x| 23.916
+k4v2-B    w  2/12  ppl  11.5752    51.8s  ETA 48.66 h  sat 0.00e+00 max|x| 24.718
+k4v3-A    w  1/12  ppl   7.9434   512.0s  ETA 49.26 h  sat 0.00e+00 max|x| 24.154
+k4v3-A    w  2/12  ppl  10.6896   506.5s  ETA 49.80 h  sat 0.00e+00 max|x| 24.644
+k4v3-B    w  1/12  ppl   7.8788    70.1s  ETA 48.93 h  sat 0.00e+00 max|x| 24.408
+k4v3-B    w  2/12  ppl  10.6390    67.8s  ETA 48.08 h  sat 0.00e+00 max|x| 24.806
+k4v4-A    w  1/12  ppl   7.8022   523.7s  ETA 48.66 h  sat 0.00e+00 max|x| 23.749
+k4v4-A    w  2/12  ppl  10.4186   524.0s  ETA 49.21 h  sat 0.00e+00 max|x| 24.356
+k4v4-B    w  1/12  ppl   7.7920    98.7s  ETA 48.49 h  sat 0.00e+00 max|x| 24.015
+k4v4-B    w  2/12  ppl  10.4829   100.8s  ETA 47.80 h  sat 0.00e+00 max|x| 24.554
+k4v5-A    w  1/12  ppl   7.7105   519.9s  ETA 48.32 h  sat 0.00e+00 max|x| 23.949
+k4v5-A    w  2/12  ppl  10.3662   520.2s  ETA 48.80 h  sat 0.00e+00 max|x| 24.691
+k4v5-B    w  1/12  ppl   7.7219   154.2s  ETA 48.29 h  sat 0.00e+00 max|x| 23.927
+k4v5-B    w  2/12  ppl  10.4185   155.7s  ETA 47.78 h  sat 0.00e+00 max|x| 24.445
+k4v6-A    w  1/12  ppl   7.7921   525.5s  ETA 48.26 h  sat 0.00e+00 max|x| 24.522
+k4v6-A    w  2/12  ppl  10.4519   526.6s  ETA 48.72 h  sat 0.00e+00 max|x| 24.522
+k4v6-B    w  1/12  ppl   7.7389   285.7s  ETA 48.56 h  sat 0.00e+00 max|x| 24.225
+k4v6-B    w  2/12  ppl  10.3918   279.2s  ETA 48.38 h  sat 0.00e+00 max|x| 24.627
+k5v2-A    w  1/12  ppl   8.1736   519.7s  ETA 48.79 h  sat 0.00e+00 max|x| 23.875
+k5v2-A    w  2/12  ppl  10.8959   517.8s  ETA 49.17 h  sat 0.00e+00 max|x| 24.889
+k5v2-B    w  1/12  ppl   8.0758    52.0s  ETA 48.45 h  sat 0.00e+00 max|x| 23.865
+k5v2-B    w  2/12  ppl  10.8175    52.6s  ETA 47.75 h  sat 0.00e+00 max|x| 25.087
+k5v3-A    w  1/12  ppl   7.4688   518.8s  ETA 48.13 h  sat 0.00e+00 max|x| 24.004
+k5v3-A    w  2/12  ppl  10.1470   520.1s  ETA 48.49 h  sat 0.00e+00 max|x| 24.446
+k5v3-B    w  1/12  ppl   7.4646    66.0s  ETA 47.85 h  sat 0.00e+00 max|x| 24.261
+k5v3-B    w  2/12  ppl  10.1395    64.9s  ETA 47.22 h  sat 0.00e+00 max|x| 24.850
+k5v4-A    w  1/12  ppl   7.3942   526.5s  ETA 47.59 h  sat 0.00e+00 max|x| 24.255
+k5v4-A    w  2/12  ppl  10.0039   525.3s  ETA 47.94 h  sat 0.00e+00 max|x| 24.255
+k5v4-B    w  1/12  ppl   7.4202    93.3s  ETA 47.39 h  sat 0.00e+00 max|x| 23.915
+k5v4-B    w  2/12  ppl  10.0345    97.1s  ETA 46.86 h  sat 0.00e+00 max|x| 24.268
+k5v5-A    w  1/12  ppl   7.3561   532.2s  ETA 47.22 h  sat 0.00e+00 max|x| 24.047
+k5v5-A    w  2/12  ppl   9.9741   518.2s  ETA 47.52 h  sat 0.00e+00 max|x| 24.302
+k5v5-B    w  1/12  ppl   7.3705   154.7s  ETA 47.12 h  sat 0.00e+00 max|x| 24.224
+k5v5-B    w  2/12  ppl   9.9745   151.9s  ETA 46.72 h  sat 0.00e+00 max|x| 24.361
+k5v6-A    w  1/12  ppl   7.3764   514.9s  ETA 47.01 h  sat 0.00e+00 max|x| 23.992
+k5v6-A    w  2/12  ppl   9.9671   516.5s  ETA 47.29 h  sat 0.00e+00 max|x| 24.639
+k5v6-B    w  1/12  ppl   7.3848   264.5s  ETA 47.11 h  sat 0.00e+00 max|x| 24.008
+k5v6-B    w  2/12  ppl   9.9723   275.4s  ETA 46.94 h  sat 0.00e+00 max|x| 24.580
+k6v2-A    w  1/12  ppl   7.9904   502.5s  ETA 47.18 h  sat 0.00e+00 max|x| 23.975
+k6v2-A    w  2/12  ppl  10.7787   503.6s  ETA 47.41 h  sat 0.00e+00 max|x| 24.912
+k6v2-B    w  1/12  ppl   7.9751    56.1s  ETA 46.87 h  sat 0.00e+00 max|x| 23.957
+k6v2-B    w  2/12  ppl  10.7287    55.2s  ETA 46.33 h  sat 0.00e+00 max|x| 24.892
+k6v3-A    w  1/12  ppl   7.3751   517.2s  ETA 46.58 h  sat 0.00e+00 max|x| 23.969
+k6v3-A    w  2/12  ppl  10.0436   512.5s  ETA 46.81 h  sat 0.00e+00 max|x| 24.676
+k6v3-B    w  1/12  ppl   7.3958    68.3s  ETA 46.31 h  sat 0.00e+00 max|x| 24.255
+k6v3-B    w  2/12  ppl  10.0549    68.6s  ETA 45.82 h  sat 0.00e+00 max|x| 24.656
+k6v4-A    w  1/12  ppl   7.3106   517.5s  ETA 46.06 h  sat 0.00e+00 max|x| 23.982
+k6v4-A    w  2/12  ppl   9.9348   535.6s  ETA 46.31 h  sat 0.00e+00 max|x| 24.366
+k6v4-B    w  1/12  ppl   7.3554   196.1s  ETA 46.04 h  sat 0.00e+00 max|x| 24.018
+k6v4-B    w  2/12  ppl   9.9555   150.5s  ETA 45.69 h  sat 0.00e+00 max|x| 24.350
+k6v5-A    w  1/12  ppl   7.2582   533.9s  ETA 45.93 h  sat 0.00e+00 max|x| 24.282
+k6v5-A    w  2/12  ppl   9.8563   533.5s  ETA 46.16 h  sat 0.00e+00 max|x| 24.397
+k6v5-B    w  1/12  ppl   7.2775   148.6s  ETA 45.82 h  sat 0.00e+00 max|x| 23.981
+k6v5-B    w  2/12  ppl   9.8621   148.4s  ETA 45.48 h  sat 0.00e+00 max|x| 24.444
+k6v6-A    w  1/12  ppl   7.2747   518.9s  ETA 45.69 h  sat 0.00e+00 max|x| 24.073
+k6v6-A    w  2/12  ppl   9.8717   520.5s  ETA 45.88 h  sat 0.00e+00 max|x| 24.376
+k6v6-B    w  1/12  ppl   7.2486   257.9s  ETA 45.71 h  sat 0.00e+00 max|x| 24.086
+k6v6-B    w  2/12  ppl   9.8549   260.4s  ETA 45.53 h  sat 0.00e+00 max|x| 24.474
+
+--- PILOT COMPLETE ---
+config           ppl   vs base  windows  B/tok/layer       sat   max|x|   hours
+baseline      9.8280   1.0000x        2            - -- --    0.00
+k2v2-A      106.6118  10.8478x        2          288  0.00e+00   28.822    0.29
+k2v2-B      101.1688  10.2939x        2          288  0.00e+00   29.964    0.03
+k2v3-A       90.1481   9.1726x        2          352  0.00e+00   28.291    0.29
+k2v3-B       97.9454   9.9660x        2          352  0.00e+00   30.183    0.04
+k2v4-A       76.5888   7.7929x        2          416  0.00e+00   28.092    0.29
+k2v4-B       78.3508   7.9722x        2          416  0.00e+00   27.563    0.06
+k2v5-A       77.9049   7.9268x        2          480  0.00e+00   28.481    0.29
+k2v5-B       77.0391   7.8387x        2          480  0.00e+00   29.674    0.08
+k2v6-A       72.2972   7.3562x        2          544  0.00e+00   27.928    0.29
+k2v6-B       70.9029   7.2144x        2          544  0.00e+00   29.143    0.15
+k3v2-A       15.5060   1.5777x        2          352  0.00e+00   25.066    0.28
+k3v2-B       15.3251   1.5593x        2          352  0.00e+00   26.156    0.03
+k3v3-A       13.8718   1.4115x        2          416  0.00e+00   30.479    0.28
+k3v3-B       13.9431   1.4187x        2          416  0.00e+00   26.614    0.04
+k3v4-A       13.5718   1.3809x        2          480  0.00e+00   26.016    0.29
+k3v4-B       13.5057   1.3742x        2          480  0.00e+00   28.708    0.06
+k3v5-A       13.0325   1.3261x        2          544  0.00e+00   25.125    0.29
+k3v5-B       13.0766   1.3305x        2          544  0.00e+00   27.036    0.09
+k3v6-A       13.0269   1.3255x        2          608  0.00e+00   26.479    0.29
+k3v6-B       13.2898   1.3522x        2          608  0.00e+00   26.740    0.16
+k4v2-A       11.4779   1.1679x        2          416  0.00e+00   25.290    0.29
+k4v2-B       11.5752   1.1778x        2          416  0.00e+00   24.718    0.03
+k4v3-A       10.6896   1.0877x        2          480  0.00e+00   24.644    0.28
+k4v3-B       10.6390   1.0825x        2          480  0.00e+00   24.806    0.04
+k4v4-A       10.4186   1.0601x        2          544  0.00e+00   24.356    0.29
+k4v4-B       10.4829   1.0666x        2          544  0.00e+00   24.554    0.06
+k4v5-A       10.3662   1.0548x        2          608  0.00e+00   24.691    0.29
+k4v5-B       10.4185   1.0601x        2          608  0.00e+00   24.445    0.09
+k4v6-A       10.4519   1.0635x        2          672  0.00e+00   24.522    0.29
+k4v6-B       10.3918   1.0574x        2          672  0.00e+00   24.627    0.16
+k5v2-A       10.8959   1.1087x        2          480  0.00e+00   24.889    0.29
+k5v2-B       10.8175   1.1007x        2          480  0.00e+00   25.087    0.03
+k5v3-A       10.1470   1.0325x        2          544  0.00e+00   24.446    0.29
+k5v3-B       10.1395   1.0317x        2          544  0.00e+00   24.850    0.04
+k5v4-A       10.0039   1.0179x        2          608  0.00e+00   24.255    0.29
+k5v4-B       10.0345   1.0210x        2          608  0.00e+00   24.268    0.05
+k5v5-A        9.9741   1.0149x        2          672  0.00e+00   24.302    0.29
+k5v5-B        9.9745   1.0149x        2          672  0.00e+00   24.361    0.09
+k5v6-A        9.9671   1.0142x        2          736  0.00e+00   24.639    0.29
+k5v6-B        9.9723   1.0147x        2          736  0.00e+00   24.580    0.15
+k6v2-A       10.7787   1.0967x        2          544  0.00e+00   24.912    0.28
+k6v2-B       10.7287   1.0916x        2          544  0.00e+00   24.892    0.03
+k6v3-A       10.0436   1.0219x        2          608  0.00e+00   24.676    0.29
+k6v3-B       10.0549   1.0231x        2          608  0.00e+00   24.656    0.04
+k6v4-A        9.9348   1.0109x        2          672  0.00e+00   24.366    0.29
+k6v4-B        9.9555   1.0130x        2          672  0.00e+00   24.350    0.10
+k6v5-A        9.8563   1.0029x        2          736  0.00e+00   24.397    0.30
+k6v5-B        9.8621   1.0035x        2          736  0.00e+00   24.444    0.08
+k6v6-A        9.8717   1.0044x        2          800  0.00e+00   24.376    0.29
+k6v6-B        9.8549   1.0027x        2          800  0.00e+00   24.474    0.14
+
+baseline  w  3/12  ppl  11.4049     0.7s  ETA 45.00 h
+baseline  w  4/12  ppl  10.8751     0.7s  ETA 44.48 h
+baseline  w  5/12  ppl  10.3661     0.7s  ETA 43.97 h
+baseline  w  6/12  ppl   9.5242     0.7s  ETA 43.47 h
+k2v2-A    w  3/12  ppl 117.8231   508.9s  ETA 43.65 h  sat 0.00e+00 max|x| 31.813
+k2v2-A    w  4/12  ppl 120.1811   517.4s  ETA 43.83 h  sat 0.00e+00 max|x| 31.813
+k2v2-A    w  5/12  ppl 117.3301   516.5s  ETA 44.01 h  sat 0.00e+00 max|x| 31.813
+k2v2-A    w  6/12  ppl 107.0556   515.7s  ETA 44.17 h  sat 0.00e+00 max|x| 34.329
+k2v2-B    w  3/12  ppl 114.4211    53.3s  ETA 43.76 h  sat 0.00e+00 max|x| 29.964
+k2v2-B    w  4/12  ppl 117.6786    53.6s  ETA 43.35 h  sat 0.00e+00 max|x| 30.300
+k2v2-B    w  5/12  ppl 117.9795    53.2s  ETA 42.94 h  sat 0.00e+00 max|x| 30.300
+k2v2-B    w  6/12  ppl 107.3634    52.7s  ETA 42.55 h  sat 0.00e+00 max|x| 32.777
+k2v3-A    w  3/12  ppl 100.2627   513.8s  ETA 42.71 h  sat 0.00e+00 max|x| 29.300
+k2v3-A    w  4/12  ppl 105.0899   518.1s  ETA 42.87 h  sat 0.00e+00 max|x| 29.300
+k2v3-A    w  5/12  ppl 103.5969   532.1s  ETA 43.05 h  sat 0.00e+00 max|x| 31.087
+k2v3-A    w  6/12  ppl  94.3518   546.4s  ETA 43.23 h  sat 0.00e+00 max|x| 31.087
+k2v3-B    w  3/12  ppl 108.1531    75.8s  ETA 42.87 h  sat 0.00e+00 max|x| 30.183
+k2v3-B    w  4/12  ppl 109.0407    74.7s  ETA 42.51 h  sat 0.00e+00 max|x| 30.183
+k2v3-B    w  5/12  ppl 105.9783    82.1s  ETA 42.17 h  sat 0.00e+00 max|x| 30.183
+k2v3-B    w  6/12  ppl  96.1792    85.6s  ETA 41.83 h  sat 0.00e+00 max|x| 30.183
+k2v4-A    w  3/12  ppl  87.8192   542.3s  ETA 42.01 h  sat 0.00e+00 max|x| 32.149
+k2v4-A    w  4/12  ppl  91.0791   543.1s  ETA 42.18 h  sat 0.00e+00 max|x| 32.149
+k2v4-A    w  5/12  ppl  92.6160   541.5s  ETA 42.34 h  sat 0.00e+00 max|x| 32.149
+k2v4-A    w  6/12  ppl  85.5580   539.7s  ETA 42.50 h  sat 0.00e+00 max|x| 32.149
+k2v4-B    w  3/12  ppl  90.9948   124.3s  ETA 42.21 h  sat 0.00e+00 max|x| 27.696
+k2v4-B    w  4/12  ppl  94.3160   104.5s  ETA 41.91 h  sat 0.00e+00 max|x| 28.838
+k2v4-B    w  5/12  ppl  94.7352    94.5s  ETA 41.59 h  sat 0.00e+00 max|x| 28.838
+k2v4-B    w  6/12  ppl  87.7734    96.4s  ETA 41.29 h  sat 0.00e+00 max|x| 29.838
+k2v5-A    w  3/12  ppl  89.9106   530.8s  ETA 41.43 h  sat 0.00e+00 max|x| 28.682
+k2v5-A    w  4/12  ppl  91.5209   539.7s  ETA 41.58 h  sat 0.00e+00 max|x| 29.003
+k2v5-A    w  5/12  ppl  93.9549   540.7s  ETA 41.72 h  sat 0.00e+00 max|x| 29.003
+k2v5-A    w  6/12  ppl  87.6064   542.0s  ETA 41.86 h  sat 0.00e+00 max|x| 30.685
+k2v5-B    w  3/12  ppl  89.2323   187.8s  ETA 41.65 h  sat 0.00e+00 max|x| 29.674
+k2v5-B    w  4/12  ppl  93.1556   202.9s  ETA 41.45 h  sat 0.00e+00 max|x| 29.674
+k2v5-B    w  5/12  ppl  92.5543   196.5s  ETA 41.26 h  sat 0.00e+00 max|x| 29.674
+k2v5-B    w  6/12  ppl  85.0450   199.4s  ETA 41.06 h  sat 0.00e+00 max|x| 34.001
+k2v6-A    w  3/12  ppl  85.7677   558.7s  ETA 41.21 h  sat 0.00e+00 max|x| 28.478
+k2v6-A    w  4/12  ppl  90.8572   557.5s  ETA 41.35 h  sat 0.00e+00 max|x| 28.791
+k2v6-A    w  5/12  ppl  91.2583   550.5s  ETA 41.48 h  sat 0.00e+00 max|x| 28.791
+k2v6-A    w  6/12  ppl  84.9523   543.2s  ETA 41.60 h  sat 0.00e+00 max|x| 30.267
+k2v6-B    w  3/12  ppl  83.1031   312.6s  ETA 41.51 h  sat 0.00e+00 max|x| 29.143
+k2v6-B    w  4/12  ppl  88.8833   290.3s  ETA 41.40 h  sat 0.00e+00 max|x| 29.199
+k2v6-B    w  5/12  ppl  90.7289   301.8s  ETA 41.29 h  sat 0.00e+00 max|x| 29.199
+k2v6-B    w  6/12  ppl  83.5266   304.5s  ETA 41.19 h  sat 0.00e+00 max|x| 30.944
+k3v2-A    w  3/12  ppl  17.8433   559.2s  ETA 41.32 h  sat 0.00e+00 max|x| 27.145
+k3v2-A    w  4/12  ppl  16.9412   556.9s  ETA 41.44 h  sat 0.00e+00 max|x| 27.145
+k3v2-A    w  5/12  ppl  16.2524   557.4s  ETA 41.55 h  sat 0.00e+00 max|x| 27.145
+k3v2-A    w  6/12  ppl  15.0170   557.9s  ETA 41.66 h  sat 0.00e+00 max|x| 30.227
+k3v2-B    w  3/12  ppl  17.5977    54.5s  ETA 41.34 h  sat 0.00e+00 max|x| 26.342
+k3v2-B    w  4/12  ppl  16.7895    53.4s  ETA 41.03 h  sat 0.00e+00 max|x| 26.342
+k3v2-B    w  5/12  ppl  16.1528    53.9s  ETA 40.72 h  sat 0.00e+00 max|x| 26.342
+k3v2-B    w  6/12  ppl  14.9520    54.1s  ETA 40.41 h  sat 0.00e+00 max|x| 30.468
+k3v3-A    w  3/12  ppl  16.0421   534.1s  ETA 40.50 h  sat 0.00e+00 max|x| 30.479
+k3v3-A    w  4/12  ppl  15.2839   533.8s  ETA 40.59 h  sat 0.00e+00 max|x| 30.479
+k3v3-A    w  5/12  ppl  14.6313   534.1s  ETA 40.67 h  sat 0.00e+00 max|x| 30.479
+k3v3-A    w  6/12  ppl  13.4708   533.6s  ETA 40.75 h  sat 0.00e+00 max|x| 30.479
+k3v3-B    w  3/12  ppl  16.0783    71.3s  ETA 40.46 h  sat 0.00e+00 max|x| 26.614
+k3v3-B    w  4/12  ppl  15.2017    75.4s  ETA 40.18 h  sat 0.00e+00 max|x| 28.983
+k3v3-B    w  5/12  ppl  14.5260    69.0s  ETA 39.90 h  sat 0.00e+00 max|x| 28.983
+k3v3-B    w  6/12  ppl  13.4553    67.3s  ETA 39.61 h  sat 0.00e+00 max|x| 29.480
+k3v4-A    w  3/12  ppl  15.6912   546.9s  ETA 39.70 h  sat 0.00e+00 max|x| 26.016
+k3v4-A    w  4/12  ppl  14.8918   546.7s  ETA 39.79 h  sat 0.00e+00 max|x| 26.016
+k3v4-A    w  5/12  ppl  14.2012   547.1s  ETA 39.87 h  sat 0.00e+00 max|x| 26.016
+k3v4-A    w  6/12  ppl  13.1281   547.1s  ETA 39.95 h  sat 0.00e+00 max|x| 27.595
+k3v4-B    w  3/12  ppl  15.5657   102.7s  ETA 39.70 h  sat 0.00e+00 max|x| 28.708
+k3v4-B    w  4/12  ppl  14.7439   103.4s  ETA 39.45 h  sat 0.00e+00 max|x| 28.708
+k3v4-B    w  5/12  ppl  14.0204   104.5s  ETA 39.21 h  sat 0.00e+00 max|x| 29.187
+k3v4-B    w  6/12  ppl  13.0506   101.1s  ETA 38.96 h  sat 0.00e+00 max|x| 29.948
+k3v5-A    w  3/12  ppl  15.1467   526.9s  ETA 39.02 h  sat 0.00e+00 max|x| 25.125
+k3v5-A    w  4/12  ppl  14.3414   526.9s  ETA 39.08 h  sat 0.00e+00 max|x| 25.125
+k3v5-A    w  5/12  ppl  13.7397   526.3s  ETA 39.14 h  sat 0.00e+00 max|x| 25.746
+k3v5-A    w  6/12  ppl  12.7288   528.1s  ETA 39.20 h  sat 0.00e+00 max|x| 29.006
+k3v5-B    w  3/12  ppl  15.2399   172.9s  ETA 39.01 h  sat 0.00e+00 max|x| 27.036
+k3v5-B    w  4/12  ppl  14.5026   173.8s  ETA 38.81 h  sat 0.00e+00 max|x| 27.036
+k3v5-B    w  5/12  ppl  13.8580   165.0s  ETA 38.62 h  sat 0.00e+00 max|x| 27.797
+k3v5-B    w  6/12  ppl  12.8354   171.8s  ETA 38.43 h  sat 0.00e+00 max|x| 30.024
+k3v6-A    w  3/12  ppl  15.2281   534.0s  ETA 38.49 h  sat 0.00e+00 max|x| 26.479
+k3v6-A    w  4/12  ppl  14.4802   532.0s  ETA 38.54 h  sat 0.00e+00 max|x| 26.479
+k3v6-A    w  5/12  ppl  13.8482   532.0s  ETA 38.59 h  sat 0.00e+00 max|x| 26.479
+k3v6-A    w  6/12  ppl  12.7561   531.7s  ETA 38.64 h  sat 0.00e+00 max|x| 31.582
+k3v6-B    w  3/12  ppl  15.4425   311.4s  ETA 38.54 h  sat 0.00e+00 max|x| 26.740
+k3v6-B    w  4/12  ppl  14.7306   308.9s  ETA 38.44 h  sat 0.00e+00 max|x| 26.740
+k3v6-B    w  5/12  ppl  14.0474   313.5s  ETA 38.35 h  sat 0.00e+00 max|x| 26.740
+k3v6-B    w  6/12  ppl  13.0027   306.2s  ETA 38.25 h  sat 0.00e+00 max|x| 29.836
+k4v2-A    w  3/12  ppl  13.3128   535.0s  ETA 38.29 h  sat 0.00e+00 max|x| 25.290
+k4v2-A    w  4/12  ppl  12.6598   534.0s  ETA 38.33 h  sat 0.00e+00 max|x| 25.290
+k4v2-A    w  5/12  ppl  12.1631   532.8s  ETA 38.37 h  sat 0.00e+00 max|x| 25.290
+k4v2-A    w  6/12  ppl  11.2022   533.6s  ETA 38.41 h  sat 0.00e+00 max|x| 27.734
+k4v2-B    w  3/12  ppl  13.3853    58.1s  ETA 38.16 h  sat 0.00e+00 max|x| 24.718
+k4v2-B    w  4/12  ppl  12.7594    53.7s  ETA 37.90 h  sat 0.00e+00 max|x| 24.718
+k4v2-B    w  5/12  ppl  12.2390    55.3s  ETA 37.65 h  sat 0.00e+00 max|x| 25.195
+k4v2-B    w  6/12  ppl  11.2920    54.7s  ETA 37.40 h  sat 0.00e+00 max|x| 27.150
+k4v3-A    w  3/12  ppl  12.3352   539.8s  ETA 37.44 h  sat 0.00e+00 max|x| 24.644
+k4v3-A    w  4/12  ppl  11.7635   539.2s  ETA 37.48 h  sat 0.00e+00 max|x| 24.644
+k4v3-A    w  5/12  ppl  11.2178   539.0s  ETA 37.51 h  sat 0.00e+00 max|x| 24.644
+k4v3-A    w  6/12  ppl  10.3259   539.4s  ETA 37.55 h  sat 0.00e+00 max|x| 26.635
+k4v3-B    w  3/12  ppl  12.3410    69.2s  ETA 37.31 h  sat 0.00e+00 max|x| 24.806
+k4v3-B    w  4/12  ppl  11.7503    74.8s  ETA 37.07 h  sat 0.00e+00 max|x| 24.806
+k4v3-B    w  5/12  ppl  11.2321    73.3s  ETA 36.84 h  sat 0.00e+00 max|x| 24.806
+k4v3-B    w  6/12  ppl  10.3434    75.0s  ETA 36.61 h  sat 0.00e+00 max|x| 27.367
+k4v4-A    w  3/12  ppl  12.0580   535.7s  ETA 36.64 h  sat 0.00e+00 max|x| 24.356
+k4v4-A    w  4/12  ppl  11.5328   535.8s  ETA 36.67 h  sat 0.00e+00 max|x| 24.356
+k4v4-A    w  5/12  ppl  11.0207   536.4s  ETA 36.70 h  sat 0.00e+00 max|x| 24.356
+k4v4-A    w  6/12  ppl  10.1399   536.4s  ETA 36.73 h  sat 0.00e+00 max|x| 26.846
+k4v4-B    w  3/12  ppl  12.1458   105.0s  ETA 36.52 h  sat 0.00e+00 max|x| 24.554
+k4v4-B    w  4/12  ppl  11.6011   117.4s  ETA 36.32 h  sat 0.00e+00 max|x| 24.554
+k4v4-B    w  5/12  ppl  11.0388   109.7s  ETA 36.11 h  sat 0.00e+00 max|x| 24.554
+k4v4-B    w  6/12  ppl  10.1636   106.5s  ETA 35.91 h  sat 0.00e+00 max|x| 26.757
+k4v5-A    w  3/12  ppl  12.0146   536.5s  ETA 35.93 h  sat 0.00e+00 max|x| 24.691
+k4v5-A    w  4/12  ppl  11.5127   534.2s  ETA 35.95 h  sat 0.00e+00 max|x| 24.691
+k4v5-A    w  5/12  ppl  10.9786   535.2s  ETA 35.97 h  sat 0.00e+00 max|x| 24.691
+k4v5-A    w  6/12  ppl  10.0953   535.8s  ETA 35.99 h  sat 0.00e+00 max|x| 27.136
+k4v5-B    w  3/12  ppl  12.0346   170.9s  ETA 35.83 h  sat 0.00e+00 max|x| 24.445
+k4v5-B    w  4/12  ppl  11.5089   169.0s  ETA 35.66 h  sat 0.00e+00 max|x| 24.445
+k4v5-B    w  5/12  ppl  10.9619   180.2s  ETA 35.49 h  sat 0.00e+00 max|x| 24.445
+k4v5-B    w  6/12  ppl  10.0765   165.8s  ETA 35.32 h  sat 0.00e+00 max|x| 27.273
+k4v6-A    w  3/12  ppl  12.0942   570.1s  ETA 35.36 h  sat 0.00e+00 max|x| 24.522
+k4v6-A    w  4/12  ppl  11.5895   569.6s  ETA 35.39 h  sat 0.00e+00 max|x| 24.522
+k4v6-A    w  5/12  ppl  11.0418   569.9s  ETA 35.42 h  sat 0.00e+00 max|x| 24.522
+k4v6-A    w  6/12  ppl  10.1568   570.3s  ETA 35.45 h  sat 0.00e+00 max|x| 27.923
+k4v6-B    w  3/12  ppl  12.0086   298.0s  ETA 35.35 h  sat 0.00e+00 max|x| 24.627
+k4v6-B    w  4/12  ppl  11.4829   294.8s  ETA 35.24 h  sat 0.00e+00 max|x| 24.627
+k4v6-B    w  5/12  ppl  10.9510   315.1s  ETA 35.14 h  sat 0.00e+00 max|x| 24.627
+k4v6-B    w  6/12  ppl  10.0958   311.9s  ETA 35.05 h  sat 0.00e+00 max|x| 26.856
+k5v2-A    w  3/12  ppl  12.6808   537.2s  ETA 35.05 h  sat 0.00e+00 max|x| 24.889
+k5v2-A    w  4/12  ppl  12.1299   535.8s  ETA 35.06 h  sat 0.00e+00 max|x| 24.889
+k5v2-A    w  5/12  ppl  11.6053   536.6s  ETA 35.07 h  sat 0.00e+00 max|x| 24.889
+k5v2-A    w  6/12  ppl  10.7034   536.9s  ETA 35.07 h  sat 0.00e+00 max|x| 26.170
+k5v2-B    w  3/12  ppl  12.6523    55.5s  ETA 34.85 h  sat 0.00e+00 max|x| 25.087
+k5v2-B    w  4/12  ppl  12.0976    54.7s  ETA 34.64 h  sat 0.00e+00 max|x| 25.087
+k5v2-B    w  5/12  ppl  11.6030    61.3s  ETA 34.43 h  sat 0.00e+00 max|x| 25.087
+k5v2-B    w  6/12  ppl  10.6936    54.3s  ETA 34.21 h  sat 0.00e+00 max|x| 26.347
+k5v3-A    w  3/12  ppl  11.8258   538.7s  ETA 34.22 h  sat 0.00e+00 max|x| 24.446
+k5v3-A    w  4/12  ppl  11.2887   538.9s  ETA 34.22 h  sat 0.00e+00 max|x| 24.446
+k5v3-A    w  5/12  ppl  10.7768   539.0s  ETA 34.22 h  sat 0.00e+00 max|x| 24.446
+k5v3-A    w  6/12  ppl   9.8882   538.9s  ETA 34.22 h  sat 0.00e+00 max|x| 25.449
+k5v3-B    w  3/12  ppl  11.8171    77.8s  ETA 34.02 h  sat 0.00e+00 max|x| 24.850
+k5v3-B    w  4/12  ppl  11.2900    76.8s  ETA 33.83 h  sat 0.00e+00 max|x| 24.850
+k5v3-B    w  5/12  ppl  10.7805    73.2s  ETA 33.63 h  sat 0.00e+00 max|x| 24.850
+k5v3-B    w  6/12  ppl   9.8997    75.9s  ETA 33.43 h  sat 0.00e+00 max|x| 25.481
+k5v4-A    w  3/12  ppl  11.6054   534.3s  ETA 33.43 h  sat 0.00e+00 max|x| 24.255
+k5v4-A    w  4/12  ppl  11.0751   535.6s  ETA 33.42 h  sat 0.00e+00 max|x| 24.255
+k5v4-A    w  5/12  ppl  10.5708   535.1s  ETA 33.42 h  sat 0.00e+00 max|x| 24.255
+k5v4-A    w  6/12  ppl   9.7173   534.6s  ETA 33.42 h  sat 0.00e+00 max|x| 25.314
+k5v4-B    w  3/12  ppl  11.6363   100.8s  ETA 33.23 h  sat 0.00e+00 max|x| 24.268
+k5v4-B    w  4/12  ppl  11.0894   113.5s  ETA 33.05 h  sat 0.00e+00 max|x| 24.268
+k5v4-B    w  5/12  ppl  10.5771    99.0s  ETA 32.87 h  sat 0.00e+00 max|x| 24.268
+k5v4-B    w  6/12  ppl   9.7163    99.9s  ETA 32.69 h  sat 0.00e+00 max|x| 25.626
+k5v5-A    w  3/12  ppl  11.5609   566.8s  ETA 32.70 h  sat 0.00e+00 max|x| 24.302
+k5v5-A    w  4/12  ppl  11.0317   576.9s  ETA 32.70 h  sat 0.00e+00 max|x| 24.302
+k5v5-A    w  5/12  ppl  10.5214   575.4s  ETA 32.71 h  sat 0.00e+00 max|x| 24.302
+k5v5-A    w  6/12  ppl   9.6545   576.6s  ETA 32.72 h  sat 0.00e+00 max|x| 25.566
+k5v5-B    w  3/12  ppl  11.5570   175.2s  ETA 32.57 h  sat 0.00e+00 max|x| 24.361
+k5v5-B    w  4/12  ppl  11.0317   173.5s  ETA 32.42 h  sat 0.00e+00 max|x| 24.361
+k5v5-B    w  5/12  ppl  10.5055   168.6s  ETA 32.26 h  sat 0.00e+00 max|x| 24.361
+k5v5-B    w  6/12  ppl   9.6480   171.6s  ETA 32.11 h  sat 0.00e+00 max|x| 25.491
+k5v6-A    w  3/12  ppl  11.5912   530.8s  ETA 32.10 h  sat 0.00e+00 max|x| 24.639
+k5v6-A    w  4/12  ppl  11.0673   531.2s  ETA 32.09 h  sat 0.00e+00 max|x| 24.639
+k5v6-A    w  5/12  ppl  10.5487   531.1s  ETA 32.07 h  sat 0.00e+00 max|x| 24.639
+k5v6-A    w  6/12  ppl   9.6765   530.4s  ETA 32.06 h  sat 0.00e+00 max|x| 25.229
+k5v6-B    w  3/12  ppl  11.5893   309.7s  ETA 31.96 h  sat 0.00e+00 max|x| 24.580
+k5v6-B    w  4/12  ppl  11.0576   285.5s  ETA 31.85 h  sat 0.00e+00 max|x| 24.580
+k5v6-B    w  5/12  ppl  10.5312   294.0s  ETA 31.75 h  sat 0.00e+00 max|x| 24.580
+k5v6-B    w  6/12  ppl   9.6779   294.5s  ETA 31.64 h  sat 0.00e+00 max|x| 25.225
+k6v2-A    w  3/12  ppl  12.5186   536.3s  ETA 31.63 h  sat 0.00e+00 max|x| 24.912
+k6v2-A    w  4/12  ppl  11.9619   538.1s  ETA 31.61 h  sat 0.00e+00 max|x| 24.912
+k6v2-A    w  5/12  ppl  11.4402   539.0s  ETA 31.59 h  sat 0.00e+00 max|x| 24.912
+k6v2-A    w  6/12  ppl  10.5195   539.0s  ETA 31.57 h  sat 0.00e+00 max|x| 26.385
+k6v2-B    w  3/12  ppl  12.4926    55.7s  ETA 31.38 h  sat 0.00e+00 max|x| 24.892
+k6v2-B    w  4/12  ppl  11.9382    58.2s  ETA 31.20 h  sat 0.00e+00 max|x| 24.892
+k6v2-B    w  5/12  ppl  11.4073    62.0s  ETA 31.01 h  sat 0.00e+00 max|x| 24.892
+k6v2-B    w  6/12  ppl  10.4942    55.4s  ETA 30.83 h  sat 0.00e+00 max|x| 26.338
+k6v3-A    w  3/12  ppl  11.6993   529.9s  ETA 30.81 h  sat 0.00e+00 max|x| 24.676
+k6v3-A    w  4/12  ppl  11.1598   530.0s  ETA 30.78 h  sat 0.00e+00 max|x| 24.676
+k6v3-A    w  5/12  ppl  10.6631   529.5s  ETA 30.76 h  sat 0.00e+00 max|x| 24.676
+k6v3-A    w  6/12  ppl   9.7902   529.3s  ETA 30.73 h  sat 0.00e+00 max|x| 26.088
+k6v3-B    w  3/12  ppl  11.7331    77.6s  ETA 30.56 h  sat 0.00e+00 max|x| 24.656
+k6v3-B    w  4/12  ppl  11.1926    75.6s  ETA 30.38 h  sat 0.00e+00 max|x| 24.656
+k6v3-B    w  5/12  ppl  10.6806    72.9s  ETA 30.21 h  sat 0.00e+00 max|x| 24.656
+k6v3-B    w  6/12  ppl   9.8000    73.2s  ETA 30.03 h  sat 0.00e+00 max|x| 26.007
+k6v4-A    w  3/12  ppl  11.5311   542.0s  ETA 30.01 h  sat 0.00e+00 max|x| 24.366
+k6v4-A    w  4/12  ppl  10.9736   543.2s  ETA 29.99 h  sat 0.00e+00 max|x| 24.366
+k6v4-A    w  5/12  ppl  10.4747   543.0s  ETA 29.97 h  sat 0.00e+00 max|x| 24.366
+k6v4-A    w  6/12  ppl   9.6314   542.4s  ETA 29.94 h  sat 0.00e+00 max|x| 25.593
+k6v4-B    w  3/12  ppl  11.5441   104.1s  ETA 29.78 h  sat 0.00e+00 max|x| 24.350
+k6v4-B    w  4/12  ppl  10.9822   109.7s  ETA 29.62 h  sat 0.00e+00 max|x| 24.350
+k6v4-B    w  5/12  ppl  10.4789   101.1s  ETA 29.46 h  sat 0.00e+00 max|x| 24.350
+k6v4-B    w  6/12  ppl   9.6263   112.9s  ETA 29.30 h  sat 0.00e+00 max|x| 25.537
+k6v5-A    w  3/12  ppl  11.4477   539.9s  ETA 29.27 h  sat 0.00e+00 max|x| 24.397
+k6v5-A    w  4/12  ppl  10.9243   540.7s  ETA 29.25 h  sat 0.00e+00 max|x| 24.397
+k6v5-A    w  5/12  ppl  10.4291   539.9s  ETA 29.22 h  sat 0.00e+00 max|x| 24.397
+k6v5-A    w  6/12  ppl   9.5879   540.1s  ETA 29.19 h  sat 0.00e+00 max|x| 25.575
+k6v5-B    w  3/12  ppl  11.4490   167.6s  ETA 29.05 h  sat 0.00e+00 max|x| 24.444
+k6v5-B    w  4/12  ppl  10.9227   159.4s  ETA 28.91 h  sat 0.00e+00 max|x| 24.444
+k6v5-B    w  5/12  ppl  10.4238   177.2s  ETA 28.77 h  sat 0.00e+00 max|x| 24.444
+k6v5-B    w  6/12  ppl   9.5834   164.2s  ETA 28.63 h  sat 0.00e+00 max|x| 26.049
+k6v6-A    w  3/12  ppl  11.4565   568.0s  ETA 28.61 h  sat 0.00e+00 max|x| 24.376
+k6v6-A    w  4/12  ppl  10.9346   568.5s  ETA 28.59 h  sat 0.00e+00 max|x| 24.376
+k6v6-A    w  5/12  ppl  10.4362   569.1s  ETA 28.57 h  sat 0.00e+00 max|x| 24.376
+k6v6-A    w  6/12  ppl   9.5889   570.5s  ETA 28.54 h  sat 0.00e+00 max|x| 25.696
+k6v6-B    w  3/12  ppl  11.4394   295.1s  ETA 28.44 h  sat 0.00e+00 max|x| 24.474
+k6v6-B    w  4/12  ppl  10.9150   305.0s  ETA 28.34 h  sat 0.00e+00 max|x| 24.474
+k6v6-B    w  5/12  ppl  10.4136   295.9s  ETA 28.24 h  sat 0.00e+00 max|x| 24.474
+k6v6-B    w  6/12  ppl   9.5712   295.0s  ETA 28.14 h  sat 0.00e+00 max|x| 26.017
+baseline  w  7/12  ppl   9.0748     0.7s  ETA 27.96 h
+baseline  w  8/12  ppl   9.0455     0.7s  ETA 27.77 h
+baseline  w  9/12  ppl   9.3509     0.7s  ETA 27.59 h
+baseline  w 10/12  ppl   9.2976     0.7s  ETA 27.41 h
+k2v2-A    w  7/12  ppl  98.3352   530.5s  ETA 27.38 h  sat 0.00e+00 max|x| 34.329
+k2v2-A    w  8/12  ppl  97.3032   531.1s  ETA 27.34 h  sat 0.00e+00 max|x| 34.329
+k2v2-A    w  9/12  ppl 100.9229   529.6s  ETA 27.30 h  sat 0.00e+00 max|x| 34.329
+k2v2-A    w 10/12  ppl  99.0975   530.7s  ETA 27.27 h  sat 0.00e+00 max|x| 34.329
+k2v2-B    w  7/12  ppl 100.7453    54.7s  ETA 27.10 h  sat 0.00e+00 max|x| 32.777
+k2v2-B    w  8/12  ppl  99.3987    55.0s  ETA 26.94 h  sat 0.00e+00 max|x| 32.777
+k2v2-B    w  9/12  ppl 102.9060    58.4s  ETA 26.78 h  sat 0.00e+00 max|x| 32.777
+k2v2-B    w 10/12  ppl 100.8523    55.3s  ETA 26.62 h  sat 0.00e+00 max|x| 32.777
+k2v3-A    w  7/12  ppl  87.9153   527.6s  ETA 26.58 h  sat 0.00e+00 max|x| 31.087
+k2v3-A    w  8/12  ppl  87.7112   530.5s  ETA 26.54 h  sat 0.00e+00 max|x| 31.491
+k2v3-A    w  9/12  ppl  90.7055   535.1s  ETA 26.50 h  sat 0.00e+00 max|x| 31.491
+k2v3-A    w 10/12  ppl  88.8835   530.1s  ETA 26.46 h  sat 0.00e+00 max|x| 31.491
+k2v3-B    w  7/12  ppl  88.1765   241.2s  ETA 26.35 h  sat 0.00e+00 max|x| 30.183
+k2v3-B    w  8/12  ppl  87.6490   219.2s  ETA 26.23 h  sat 0.00e+00 max|x| 30.183
+k2v3-B    w  9/12  ppl  91.0351   214.6s  ETA 26.11 h  sat 0.00e+00 max|x| 30.843
+k2v3-B    w 10/12  ppl  89.7301   292.3s  ETA 26.02 h  sat 0.00e+00 max|x| 30.843
+k2v4-A    w  7/12  ppl  80.3617   556.5s  ETA 25.98 h  sat 0.00e+00 max|x| 32.149
+k2v4-A    w  8/12  ppl  80.0554   532.1s  ETA 25.94 h  sat 0.00e+00 max|x| 32.149
+k2v4-A    w  9/12  ppl  82.3387   532.1s  ETA 25.90 h  sat 0.00e+00 max|x| 32.422
+k2v4-A    w 10/12  ppl  81.3749   532.1s  ETA 25.85 h  sat 0.00e+00 max|x| 32.422
+k2v4-B    w  7/12  ppl  81.9863   101.8s  ETA 25.71 h  sat 0.00e+00 max|x| 29.892
+k2v4-B    w  8/12  ppl  82.1372   103.8s  ETA 25.56 h  sat 0.00e+00 max|x| 29.892
+k2v4-B    w  9/12  ppl  84.6215   109.5s  ETA 25.42 h  sat 0.00e+00 max|x| 30.254
+k2v4-B    w 10/12  ppl  83.2790   100.4s  ETA 25.28 h  sat 0.00e+00 max|x| 32.276
+k2v5-A    w  7/12  ppl  81.8534   532.9s  ETA 25.24 h  sat 0.00e+00 max|x| 33.670
+k2v5-A    w  8/12  ppl  80.9028   532.8s  ETA 25.19 h  sat 0.00e+00 max|x| 33.670
+k2v5-A    w  9/12  ppl  83.1022   532.8s  ETA 25.15 h  sat 0.00e+00 max|x| 33.670
+k2v5-A    w 10/12  ppl  81.2860   533.7s  ETA 25.10 h  sat 0.00e+00 max|x| 33.670
+k2v5-B    w  7/12  ppl  79.7802   158.6s  ETA 24.97 h  sat 0.00e+00 max|x| 34.001
+k2v5-B    w  8/12  ppl  79.2830   154.9s  ETA 24.84 h  sat 0.00e+00 max|x| 34.001
+k2v5-B    w  9/12  ppl  81.9049   165.0s  ETA 24.71 h  sat 0.00e+00 max|x| 34.001
+k2v5-B    w 10/12  ppl  80.3369   157.0s  ETA 24.58 h  sat 0.00e+00 max|x| 34.001
+k2v6-A    w  7/12  ppl  79.9892   532.6s  ETA 24.54 h  sat 0.00e+00 max|x| 30.267
+k2v6-A    w  8/12  ppl  79.1101   533.9s  ETA 24.49 h  sat 0.00e+00 max|x| 30.267
+k2v6-A    w  9/12  ppl  81.5720   534.2s  ETA 24.45 h  sat 0.00e+00 max|x| 31.777
+k2v6-A    w 10/12  ppl  80.4297   533.7s  ETA 24.40 h  sat 0.00e+00 max|x| 31.777
+k2v6-B    w  7/12  ppl  79.1006   299.3s  ETA 24.30 h  sat 0.00e+00 max|x| 34.259
+k2v6-B    w  8/12  ppl  79.1259   300.8s  ETA 24.20 h  sat 0.00e+00 max|x| 34.259
+k2v6-B    w  9/12  ppl  82.3027   303.2s  ETA 24.10 h  sat 0.00e+00 max|x| 34.259
+k2v6-B    w 10/12  ppl  80.8618   306.4s  ETA 24.01 h  sat 0.00e+00 max|x| 34.259
+k3v2-A    w  7/12  ppl  14.2516   537.6s  ETA 23.96 h  sat 0.00e+00 max|x| 30.227
+k3v2-A    w  8/12  ppl  14.2865   537.2s  ETA 23.91 h  sat 0.00e+00 max|x| 30.227
+k3v2-A    w  9/12  ppl  14.6985   537.2s  ETA 23.86 h  sat 0.00e+00 max|x| 30.227
+k3v2-A    w 10/12  ppl  14.5577   535.2s  ETA 23.81 h  sat 0.00e+00 max|x| 30.227
+k3v2-B    w  7/12  ppl  14.2147    54.6s  ETA 23.66 h  sat 0.00e+00 max|x| 30.468
+k3v2-B    w  8/12  ppl  14.2225    61.4s  ETA 23.52 h  sat 0.00e+00 max|x| 30.468
+k3v2-B    w  9/12  ppl  14.6359    60.7s  ETA 23.37 h  sat 0.00e+00 max|x| 30.468
+k3v2-B    w 10/12  ppl  14.4880    58.6s  ETA 23.23 h  sat 0.00e+00 max|x| 30.468
+k3v3-A    w  7/12  ppl  12.8129   537.8s  ETA 23.18 h  sat 0.00e+00 max|x| 30.479
+k3v3-A    w  8/12  ppl  12.7563   536.9s  ETA 23.12 h  sat 0.00e+00 max|x| 30.479
+k3v3-A    w  9/12  ppl  13.1371   536.9s  ETA 23.07 h  sat 0.00e+00 max|x| 30.479
+k3v3-A    w 10/12  ppl  12.9928   537.7s  ETA 23.02 h  sat 0.00e+00 max|x| 30.479
+k3v3-B    w  7/12  ppl  12.7947    71.3s  ETA 22.88 h  sat 0.00e+00 max|x| 29.480
+k3v3-B    w  8/12  ppl  12.7445    75.9s  ETA 22.74 h  sat 0.00e+00 max|x| 29.693
+k3v3-B    w  9/12  ppl  13.1024    70.6s  ETA 22.60 h  sat 0.00e+00 max|x| 29.693
+k3v3-B    w 10/12  ppl  12.9299    68.3s  ETA 22.46 h  sat 0.00e+00 max|x| 29.693
+k3v4-A    w  7/12  ppl  12.4829   528.4s  ETA 22.40 h  sat 0.00e+00 max|x| 27.926
+k3v4-A    w  8/12  ppl  12.4082   528.0s  ETA 22.35 h  sat 0.00e+00 max|x| 27.926
+k3v4-A    w  9/12  ppl  12.7910   528.5s  ETA 22.29 h  sat 0.00e+00 max|x| 27.926
+k3v4-A    w 10/12  ppl  12.6389   528.2s  ETA 22.24 h  sat 0.00e+00 max|x| 27.926
+k3v4-B    w  7/12  ppl  12.4315   105.3s  ETA 22.11 h  sat 0.00e+00 max|x| 29.948
+k3v4-B    w  8/12  ppl  12.3806   110.5s  ETA 21.98 h  sat 0.00e+00 max|x| 29.948
+k3v4-B    w  9/12  ppl  12.7484    99.3s  ETA 21.84 h  sat 0.00e+00 max|x| 29.948
+k3v4-B    w 10/12  ppl  12.5849   108.4s  ETA 21.71 h  sat 0.00e+00 max|x| 29.948
+k3v5-A    w  7/12  ppl  12.1427   530.5s  ETA 21.66 h  sat 0.00e+00 max|x| 29.006
+k3v5-A    w  8/12  ppl  12.1460   530.9s  ETA 21.60 h  sat 0.00e+00 max|x| 29.006
+k3v5-A    w  9/12  ppl  12.5609   530.5s  ETA 21.54 h  sat 0.00e+00 max|x| 29.006
+k3v5-A    w 10/12  ppl  12.4140   530.7s  ETA 21.49 h  sat 0.00e+00 max|x| 29.006
+k3v5-B    w  7/12  ppl  12.2542   173.2s  ETA 21.37 h  sat 0.00e+00 max|x| 30.024
+k3v5-B    w  8/12  ppl  12.2157   185.0s  ETA 21.25 h  sat 0.00e+00 max|x| 30.024
+k3v5-B    w  9/12  ppl  12.6080   180.3s  ETA 21.14 h  sat 0.00e+00 max|x| 30.024
+k3v5-B    w 10/12  ppl  12.4785   186.1s  ETA 21.02 h  sat 0.00e+00 max|x| 30.024
+k3v6-A    w  7/12  ppl  12.1675   535.3s  ETA 20.96 h  sat 0.00e+00 max|x| 31.582
+k3v6-A    w  8/12  ppl  12.1399   535.5s  ETA 20.91 h  sat 0.00e+00 max|x| 31.582
+k3v6-A    w  9/12  ppl  12.5009   535.7s  ETA 20.85 h  sat 0.00e+00 max|x| 31.582
+k3v6-A    w 10/12  ppl  12.3747   535.8s  ETA 20.79 h  sat 0.00e+00 max|x| 31.582
+k3v6-B    w  7/12  ppl  12.4101   292.5s  ETA 20.69 h  sat 0.00e+00 max|x| 29.836
+k3v6-B    w  8/12  ppl  12.3738   313.6s  ETA 20.60 h  sat 0.00e+00 max|x| 29.836
+k3v6-B    w  9/12  ppl  12.7448   291.7s  ETA 20.50 h  sat 0.00e+00 max|x| 29.836
+k3v6-B    w 10/12  ppl  12.5898   283.9s  ETA 20.40 h  sat 0.00e+00 max|x| 29.836
+k4v2-A    w  7/12  ppl  10.6806   542.4s  ETA 20.34 h  sat 0.00e+00 max|x| 27.734
+k4v2-A    w  8/12  ppl  10.6535   541.9s  ETA 20.28 h  sat 0.00e+00 max|x| 27.734
+k4v2-A    w  9/12  ppl  11.0078   542.0s  ETA 20.22 h  sat 0.00e+00 max|x| 27.734
+k4v2-A    w 10/12  ppl  10.9080   542.1s  ETA 20.16 h  sat 0.00e+00 max|x| 27.734
+k4v2-B    w  7/12  ppl  10.7781    58.7s  ETA 20.03 h  sat 0.00e+00 max|x| 27.150
+k4v2-B    w  8/12  ppl  10.7511    59.7s  ETA 19.90 h  sat 0.00e+00 max|x| 27.150
+k4v2-B    w  9/12  ppl  11.1210    56.9s  ETA 19.76 h  sat 0.00e+00 max|x| 27.150
+k4v2-B    w 10/12  ppl  11.0267    57.6s  ETA 19.63 h  sat 0.00e+00 max|x| 27.150
+k4v3-A    w  7/12  ppl   9.8747   535.0s  ETA 19.57 h  sat 0.00e+00 max|x| 26.838
+k4v3-A    w  8/12  ppl   9.8471   535.2s  ETA 19.51 h  sat 0.00e+00 max|x| 26.838
+k4v3-A    w  9/12  ppl  10.1740   536.3s  ETA 19.44 h  sat 0.00e+00 max|x| 27.767
+k4v3-A    w 10/12  ppl  10.1033   535.6s  ETA 19.38 h  sat 0.00e+00 max|x| 27.767
+k4v3-B    w  7/12  ppl   9.8711    66.4s  ETA 19.25 h  sat 0.00e+00 max|x| 27.367
+k4v3-B    w  8/12  ppl   9.8496    68.1s  ETA 19.12 h  sat 0.00e+00 max|x| 27.367
+k4v3-B    w  9/12  ppl  10.1738    68.8s  ETA 18.99 h  sat 0.00e+00 max|x| 28.179
+k4v3-B    w 10/12  ppl  10.0902    64.3s  ETA 18.86 h  sat 0.00e+00 max|x| 28.179
+k4v4-A    w  7/12  ppl   9.6767   536.4s  ETA 18.80 h  sat 0.00e+00 max|x| 27.567
+k4v4-A    w  8/12  ppl   9.6422   536.8s  ETA 18.74 h  sat 0.00e+00 max|x| 27.567
+k4v4-A    w  9/12  ppl   9.9679   536.2s  ETA 18.67 h  sat 0.00e+00 max|x| 27.567
+k4v4-A    w 10/12  ppl   9.9072   537.0s  ETA 18.61 h  sat 0.00e+00 max|x| 27.567
+k4v4-B    w  7/12  ppl   9.7004   109.3s  ETA 18.49 h  sat 0.00e+00 max|x| 26.820
+k4v4-B    w  8/12  ppl   9.6700   109.4s  ETA 18.37 h  sat 0.00e+00 max|x| 26.820
+k4v4-B    w  9/12  ppl   9.9908   112.2s  ETA 18.25 h  sat 0.00e+00 max|x| 27.896
+k4v4-B    w 10/12  ppl   9.9177   115.7s  ETA 18.13 h  sat 0.00e+00 max|x| 27.896
+k4v5-A    w  7/12  ppl   9.6405   529.9s  ETA 18.06 h  sat 0.00e+00 max|x| 27.136
+k4v5-A    w  8/12  ppl   9.6048   529.9s  ETA 18.00 h  sat 0.00e+00 max|x| 27.136
+k4v5-A    w  9/12  ppl   9.9225   530.6s  ETA 17.93 h  sat 0.00e+00 max|x| 28.427
+k4v5-A    w 10/12  ppl   9.8555   530.4s  ETA 17.86 h  sat 0.00e+00 max|x| 28.427
+k4v5-B    w  7/12  ppl   9.6058   163.7s  ETA 17.75 h  sat 0.00e+00 max|x| 27.273
+k4v5-B    w  8/12  ppl   9.5686   170.4s  ETA 17.64 h  sat 0.00e+00 max|x| 27.273
+k4v5-B    w  9/12  ppl   9.9051   174.4s  ETA 17.53 h  sat 0.00e+00 max|x| 28.026
+k4v5-B    w 10/12  ppl   9.8448   171.7s  ETA 17.41 h  sat 0.00e+00 max|x| 28.026
+k4v6-A    w  7/12  ppl   9.6904   536.7s  ETA 17.35 h  sat 0.00e+00 max|x| 27.923
+k4v6-A    w  8/12  ppl   9.6602   537.9s  ETA 17.28 h  sat 0.00e+00 max|x| 27.923
+k4v6-A    w  9/12  ppl   9.9842   537.0s  ETA 17.22 h  sat 0.00e+00 max|x| 27.923
+k4v6-A    w 10/12  ppl   9.9144   537.0s  ETA 17.15 h  sat 0.00e+00 max|x| 27.923
+k4v6-B    w  7/12  ppl   9.6476   302.7s  ETA 17.05 h  sat 0.00e+00 max|x| 26.856
+k4v6-B    w  8/12  ppl   9.6240   288.8s  ETA 16.96 h  sat 0.00e+00 max|x| 26.856
+k4v6-B    w  9/12  ppl   9.9464   288.2s  ETA 16.86 h  sat 0.00e+00 max|x| 27.626
+k4v6-B    w 10/12  ppl   9.8797   302.9s  ETA 16.76 h  sat 0.00e+00 max|x| 27.626
+k5v2-A    w  7/12  ppl  10.2095   535.2s  ETA 16.70 h  sat 0.00e+00 max|x| 27.565
+k5v2-A    w  8/12  ppl  10.1743   535.5s  ETA 16.63 h  sat 0.00e+00 max|x| 27.565
+k5v2-A    w  9/12  ppl  10.5024   535.6s  ETA 16.56 h  sat 0.00e+00 max|x| 27.565
+k5v2-A    w 10/12  ppl  10.4120   536.0s  ETA 16.49 h  sat 0.00e+00 max|x| 27.565
+k5v2-B    w  7/12  ppl  10.2069    60.5s  ETA 16.37 h  sat 0.00e+00 max|x| 26.347
+k5v2-B    w  8/12  ppl  10.1599    57.0s  ETA 16.24 h  sat 0.00e+00 max|x| 26.347
+k5v2-B    w  9/12  ppl  10.4924    56.5s  ETA 16.12 h  sat 0.00e+00 max|x| 27.941
+k5v2-B    w 10/12  ppl  10.4049    58.0s  ETA 16.00 h  sat 0.00e+00 max|x| 27.941
+k5v3-A    w  7/12  ppl   9.4264   530.9s  ETA 15.93 h  sat 0.00e+00 max|x| 25.825
+k5v3-A    w  8/12  ppl   9.3934   530.9s  ETA 15.86 h  sat 0.00e+00 max|x| 25.825
+k5v3-A    w  9/12  ppl   9.7053   530.9s  ETA 15.79 h  sat 0.00e+00 max|x| 26.469
+k5v3-A    w 10/12  ppl   9.6353   529.1s  ETA 15.71 h  sat 0.00e+00 max|x| 26.469
+k5v3-B    w  7/12  ppl   9.4293    65.9s  ETA 15.59 h  sat 0.00e+00 max|x| 25.766
+k5v3-B    w  8/12  ppl   9.3958    68.8s  ETA 15.47 h  sat 0.00e+00 max|x| 25.766
+k5v3-B    w  9/12  ppl   9.7094    69.4s  ETA 15.35 h  sat 0.00e+00 max|x| 27.042
+k5v3-B    w 10/12  ppl   9.6392    70.5s  ETA 15.24 h  sat 0.00e+00 max|x| 27.042
+k5v4-A    w  7/12  ppl   9.2618   537.1s  ETA 15.17 h  sat 0.00e+00 max|x| 26.143
+k5v4-A    w  8/12  ppl   9.2271   535.9s  ETA 15.09 h  sat 0.00e+00 max|x| 26.143
+k5v4-A    w  9/12  ppl   9.5323   536.9s  ETA 15.02 h  sat 0.00e+00 max|x| 27.716
+k5v4-A    w 10/12  ppl   9.4792   533.8s  ETA 14.95 h  sat 0.00e+00 max|x| 27.716
+k5v4-B    w  7/12  ppl   9.2621   105.4s  ETA 14.84 h  sat 0.00e+00 max|x| 26.482
+k5v4-B    w  8/12  ppl   9.2364   102.1s  ETA 14.72 h  sat 0.00e+00 max|x| 26.482
+k5v4-B    w  9/12  ppl   9.5496   103.8s  ETA 14.61 h  sat 0.00e+00 max|x| 27.442
+k5v4-B    w 10/12  ppl   9.4896   100.6s  ETA 14.49 h  sat 0.00e+00 max|x| 27.442
+k5v5-A    w  7/12  ppl   9.2039   532.8s  ETA 14.42 h  sat 0.00e+00 max|x| 25.566
+k5v5-A    w  8/12  ppl   9.1661   532.8s  ETA 14.35 h  sat 0.00e+00 max|x| 25.826
+k5v5-A    w  9/12  ppl   9.4776   532.5s  ETA 14.28 h  sat 0.00e+00 max|x| 27.687
+k5v5-A    w 10/12  ppl   9.4233   532.3s  ETA 14.20 h  sat 0.00e+00 max|x| 27.687
+k5v5-B    w  7/12  ppl   9.1921   177.5s  ETA 14.10 h  sat 0.00e+00 max|x| 27.526
+k5v5-B    w  8/12  ppl   9.1594   169.9s  ETA 13.99 h  sat 0.00e+00 max|x| 27.526
+k5v5-B    w  9/12  ppl   9.4721   178.1s  ETA 13.88 h  sat 0.00e+00 max|x| 27.526
+k5v5-B    w 10/12  ppl   9.4177   162.4s  ETA 13.78 h  sat 0.00e+00 max|x| 27.526
+k5v6-A    w  7/12  ppl   9.2276   537.2s  ETA 13.70 h  sat 0.00e+00 max|x| 25.874
+k5v6-A    w  8/12  ppl   9.1938   537.6s  ETA 13.63 h  sat 0.00e+00 max|x| 25.874
+k5v6-A    w  9/12  ppl   9.4995   537.6s  ETA 13.56 h  sat 0.00e+00 max|x| 27.245
+k5v6-A    w 10/12  ppl   9.4402   537.2s  ETA 13.48 h  sat 0.00e+00 max|x| 27.245
+k5v6-B    w  7/12  ppl   9.2208   283.7s  ETA 13.38 h  sat 0.00e+00 max|x| 26.905
+k5v6-B    w  8/12  ppl   9.1884   296.6s  ETA 13.29 h  sat 0.00e+00 max|x| 26.905
+k5v6-B    w  9/12  ppl   9.4909   285.3s  ETA 13.19 h  sat 0.00e+00 max|x| 27.486
+k5v6-B    w 10/12  ppl   9.4277   279.2s  ETA 13.10 h  sat 0.00e+00 max|x| 27.486
+k6v2-A    w  7/12  ppl  10.0450   533.5s  ETA 13.02 h  sat 0.00e+00 max|x| 26.431
+k6v2-A    w  8/12  ppl  10.0243   533.7s  ETA 12.95 h  sat 0.00e+00 max|x| 26.431
+k6v2-A    w  9/12  ppl  10.3509   533.9s  ETA 12.87 h  sat 0.00e+00 max|x| 26.608
+k6v2-A    w 10/12  ppl  10.2689   533.3s  ETA 12.79 h  sat 0.00e+00 max|x| 26.608
+k6v2-B    w  7/12  ppl  10.0240    59.3s  ETA 12.68 h  sat 0.00e+00 max|x| 26.338
+k6v2-B    w  8/12  ppl   9.9901    57.7s  ETA 12.56 h  sat 0.00e+00 max|x| 26.338
+k6v2-B    w  9/12  ppl  10.3169    57.2s  ETA 12.45 h  sat 0.00e+00 max|x| 27.633
+k6v2-B    w 10/12  ppl  10.2336    57.1s  ETA 12.34 h  sat 0.00e+00 max|x| 27.633
+k6v3-A    w  7/12  ppl   9.3444   536.5s  ETA 12.26 h  sat 0.00e+00 max|x| 26.510
+k6v3-A    w  8/12  ppl   9.3028   536.0s  ETA 12.18 h  sat 0.00e+00 max|x| 26.510
+k6v3-A    w  9/12  ppl   9.6116   535.9s  ETA 12.11 h  sat 0.00e+00 max|x| 27.704
+k6v3-A    w 10/12  ppl   9.5448   536.0s  ETA 12.03 h  sat 0.00e+00 max|x| 27.704
+k6v3-B    w  7/12  ppl   9.3364    73.2s  ETA 11.92 h  sat 0.00e+00 max|x| 26.697
+k6v3-B    w  8/12  ppl   9.2975    70.0s  ETA 11.81 h  sat 0.00e+00 max|x| 26.697
+k6v3-B    w  9/12  ppl   9.6037    76.2s  ETA 11.70 h  sat 0.00e+00 max|x| 27.782
+k6v3-B    w 10/12  ppl   9.5328    74.2s  ETA 11.59 h  sat 0.00e+00 max|x| 27.782
+k6v4-A    w  7/12  ppl   9.1761   530.3s  ETA 11.51 h  sat 0.00e+00 max|x| 26.450
+k6v4-A    w  8/12  ppl   9.1505   530.5s  ETA 11.43 h  sat 0.00e+00 max|x| 26.450
+k6v4-A    w  9/12  ppl   9.4535   529.8s  ETA 11.35 h  sat 0.00e+00 max|x| 27.607
+k6v4-A    w 10/12  ppl   9.3994   531.1s  ETA 11.27 h  sat 0.00e+00 max|x| 27.607
+k6v4-B    w  7/12  ppl   9.1785   116.6s  ETA 11.17 h  sat 0.00e+00 max|x| 25.890
+k6v4-B    w  8/12  ppl   9.1506   100.4s  ETA 11.06 h  sat 0.00e+00 max|x| 25.890
+k6v4-B    w  9/12  ppl   9.4571   106.6s  ETA 10.95 h  sat 0.00e+00 max|x| 27.337
+k6v4-B    w 10/12  ppl   9.3979   108.4s  ETA 10.84 h  sat 0.00e+00 max|x| 27.337
+k6v5-A    w  7/12  ppl   9.1403   532.4s  ETA 10.77 h  sat 0.00e+00 max|x| 25.894
+k6v5-A    w  8/12  ppl   9.1034   531.7s  ETA 10.69 h  sat 0.00e+00 max|x| 25.894
+k6v5-A    w  9/12  ppl   9.4110   531.7s  ETA 10.61 h  sat 0.00e+00 max|x| 27.268
+k6v5-A    w 10/12  ppl   9.3585   532.1s  ETA 10.53 h  sat 0.00e+00 max|x| 27.268
+k6v5-B    w  7/12  ppl   9.1370   172.6s  ETA 10.43 h  sat 0.00e+00 max|x| 26.300
+k6v5-B    w  8/12  ppl   9.1007   178.6s  ETA 10.32 h  sat 0.00e+00 max|x| 26.300
+k6v5-B    w  9/12  ppl   9.4106   174.1s  ETA 10.22 h  sat 0.00e+00 max|x| 27.357
+k6v5-B    w 10/12  ppl   9.3565   162.7s  ETA 10.12 h  sat 0.00e+00 max|x| 27.357
+k6v6-A    w  7/12  ppl   9.1447   533.1s  ETA 10.04 h  sat 0.00e+00 max|x| 26.753
+k6v6-A    w  8/12  ppl   9.1132   531.7s  ETA  9.96 h  sat 0.00e+00 max|x| 26.753
+k6v6-A    w  9/12  ppl   9.4178   535.6s  ETA  9.88 h  sat 0.00e+00 max|x| 27.086
+k6v6-A    w 10/12  ppl   9.3630   535.6s  ETA  9.80 h  sat 0.00e+00 max|x| 27.086
+k6v6-B    w  7/12  ppl   9.1261   288.4s  ETA  9.70 h  sat 0.00e+00 max|x| 26.528
+k6v6-B    w  8/12  ppl   9.0969   311.1s  ETA  9.61 h  sat 0.00e+00 max|x| 26.528
+k6v6-B    w  9/12  ppl   9.4035   289.7s  ETA  9.52 h  sat 0.00e+00 max|x| 27.257
+k6v6-B    w 10/12  ppl   9.3473   289.4s  ETA  9.42 h  sat 0.00e+00 max|x| 27.257
+baseline  w 11/12  ppl   9.2057     0.7s  ETA  9.31 h
+baseline  w 12/12  ppl   9.3895     0.7s  ETA  9.20 h
+k2v2-A    w 11/12  ppl 100.0947   545.1s  ETA  9.12 h  sat 0.00e+00 max|x| 34.329
+k2v2-A    w 12/12  ppl 102.1468   548.7s  ETA  9.04 h  sat 0.00e+00 max|x| 34.329
+k2v2-B    w 11/12  ppl 101.6589    53.2s  ETA  8.93 h  sat 0.00e+00 max|x| 32.777
+k2v2-B    w 12/12  ppl 103.3080    57.4s  ETA  8.83 h  sat 0.00e+00 max|x| 32.777
+k2v3-A    w 11/12  ppl  89.9300   531.0s  ETA  8.74 h  sat 0.00e+00 max|x| 31.491
+k2v3-A    w 12/12  ppl  91.4258   531.8s  ETA  8.66 h  sat 0.00e+00 max|x| 31.491
+k2v3-B    w 11/12  ppl  90.4251    69.8s  ETA  8.56 h  sat 0.00e+00 max|x| 30.843
+k2v3-B    w 12/12  ppl  91.7121    72.8s  ETA  8.45 h  sat 0.00e+00 max|x| 30.843
+k2v4-A    w 11/12  ppl  82.9262   533.1s  ETA  8.37 h  sat 0.00e+00 max|x| 32.422
+k2v4-A    w 12/12  ppl  84.2349   533.0s  ETA  8.29 h  sat 0.00e+00 max|x| 32.422
+k2v4-B    w 11/12  ppl  83.8588    99.5s  ETA  8.19 h  sat 0.00e+00 max|x| 32.276
+k2v4-B    w 12/12  ppl  85.3821   107.1s  ETA  8.08 h  sat 0.00e+00 max|x| 32.276
+k2v5-A    w 11/12  ppl  82.2498   541.8s  ETA  8.00 h  sat 0.00e+00 max|x| 33.670
+k2v5-A    w 12/12  ppl  83.3800   543.0s  ETA  7.92 h  sat 0.00e+00 max|x| 33.670
+k2v5-B    w 11/12  ppl  81.1520   169.9s  ETA  7.82 h  sat 0.00e+00 max|x| 34.001
+k2v5-B    w 12/12  ppl  82.7317   165.5s  ETA  7.72 h  sat 0.00e+00 max|x| 34.001
+k2v6-A    w 11/12  ppl  80.9984   537.0s  ETA  7.64 h  sat 0.00e+00 max|x| 31.777
+k2v6-A    w 12/12  ppl  82.4657   535.9s  ETA  7.55 h  sat 0.00e+00 max|x| 31.777
+k2v6-B    w 11/12  ppl  82.1447   304.9s  ETA  7.46 h  sat 0.00e+00 max|x| 34.259
+k2v6-B    w 12/12  ppl  83.5500   305.3s  ETA  7.37 h  sat 0.00e+00 max|x| 34.259
+k3v2-A    w 11/12  ppl  14.3824   534.7s  ETA  7.28 h  sat 0.00e+00 max|x| 30.227
+k3v2-A    w 12/12  ppl  14.6583   534.2s  ETA  7.20 h  sat 0.00e+00 max|x| 30.227
+k3v2-B    w 11/12  ppl  14.3342    53.0s  ETA  7.10 h  sat 0.00e+00 max|x| 30.468
+k3v2-B    w 12/12  ppl  14.6055    54.4s  ETA  6.99 h  sat 0.00e+00 max|x| 31.135
+k3v3-A    w 11/12  ppl  12.8258   535.9s  ETA  6.91 h  sat 0.00e+00 max|x| 30.479
+k3v3-A    w 12/12  ppl  13.0430   535.9s  ETA  6.83 h  sat 0.00e+00 max|x| 30.479
+k3v3-B    w 11/12  ppl  12.8014    70.6s  ETA  6.72 h  sat 0.00e+00 max|x| 29.693
+k3v3-B    w 12/12  ppl  13.0365    72.6s  ETA  6.62 h  sat 0.00e+00 max|x| 29.693
+k3v4-A    w 11/12  ppl  12.4654   528.7s  ETA  6.54 h  sat 0.00e+00 max|x| 27.926
+k3v4-A    w 12/12  ppl  12.6855   528.4s  ETA  6.45 h  sat 0.00e+00 max|x| 29.448
+k3v4-B    w 11/12  ppl  12.4269   114.9s  ETA  6.35 h  sat 0.00e+00 max|x| 29.948
+k3v4-B    w 12/12  ppl  12.6456   110.8s  ETA  6.25 h  sat 0.00e+00 max|x| 29.948
+k3v5-A    w 11/12  ppl  12.2551   532.2s  ETA  6.17 h  sat 0.00e+00 max|x| 29.006
+k3v5-A    w 12/12  ppl  12.4893   529.8s  ETA  6.08 h  sat 0.00e+00 max|x| 29.006
+k3v5-B    w 11/12  ppl  12.3126   167.0s  ETA  5.98 h  sat 0.00e+00 max|x| 30.024
+k3v5-B    w 12/12  ppl  12.5388   174.8s  ETA  5.89 h  sat 0.00e+00 max|x| 30.024
+k3v6-A    w 11/12  ppl  12.2184   532.1s  ETA  5.80 h  sat 0.00e+00 max|x| 31.582
+k3v6-A    w 12/12  ppl  12.4504   532.5s  ETA  5.72 h  sat 0.00e+00 max|x| 31.582
+k3v6-B    w 11/12  ppl  12.4033   319.9s  ETA  5.62 h  sat 0.00e+00 max|x| 29.836
+k3v6-B    w 12/12  ppl  12.6234   305.0s  ETA  5.53 h  sat 0.00e+00 max|x| 29.836
+k4v2-A    w 11/12  ppl  10.8029   531.8s  ETA  5.44 h  sat 0.00e+00 max|x| 27.734
+k4v2-A    w 12/12  ppl  11.0146   532.1s  ETA  5.36 h  sat 0.00e+00 max|x| 27.734
+k4v2-B    w 11/12  ppl  10.9139    58.2s  ETA  5.26 h  sat 0.00e+00 max|x| 27.155
+k4v2-B    w 12/12  ppl  11.1043    57.2s  ETA  5.16 h  sat 0.00e+00 max|x| 27.155
+k4v3-A    w 11/12  ppl  10.0023   542.9s  ETA  5.07 h  sat 0.00e+00 max|x| 27.767
+k4v3-A    w 12/12  ppl  10.1944   542.5s  ETA  4.99 h  sat 0.00e+00 max|x| 27.767
+k4v3-B    w 11/12  ppl   9.9875    73.4s  ETA  4.89 h  sat 0.00e+00 max|x| 28.179
+k4v3-B    w 12/12  ppl  10.1830    73.3s  ETA  4.79 h  sat 0.00e+00 max|x| 28.179
+k4v4-A    w 11/12  ppl   9.8071   529.5s  ETA  4.70 h  sat 0.00e+00 max|x| 27.567
+k4v4-A    w 12/12  ppl  10.0136   529.1s  ETA  4.61 h  sat 0.00e+00 max|x| 27.567
+k4v4-B    w 11/12  ppl   9.8049   113.0s  ETA  4.52 h  sat 0.00e+00 max|x| 27.896
+k4v4-B    w 12/12  ppl  10.0084   111.4s  ETA  4.42 h  sat 0.00e+00 max|x| 27.896
+k4v5-A    w 11/12  ppl   9.7505   530.6s  ETA  4.33 h  sat 0.00e+00 max|x| 28.427
+k4v5-A    w 12/12  ppl   9.9556   530.7s  ETA  4.24 h  sat 0.00e+00 max|x| 28.427
+k4v5-B    w 11/12  ppl   9.7367   161.1s  ETA  4.15 h  sat 0.00e+00 max|x| 28.026
+k4v5-B    w 12/12  ppl   9.9409   172.0s  ETA  4.05 h  sat 0.00e+00 max|x| 28.026
+k4v6-A    w 11/12  ppl   9.8085   537.9s  ETA  3.96 h  sat 0.00e+00 max|x| 28.410
+k4v6-A    w 12/12  ppl  10.0084   537.8s  ETA  3.88 h  sat 0.00e+00 max|x| 28.410
+k4v6-B    w 11/12  ppl   9.7754   298.9s  ETA  3.78 h  sat 0.00e+00 max|x| 28.783
+k4v6-B    w 12/12  ppl   9.9738   303.4s  ETA  3.69 h  sat 0.00e+00 max|x| 28.783
+k5v2-A    w 11/12  ppl  10.3076   538.5s  ETA  3.60 h  sat 0.00e+00 max|x| 27.565
+k5v2-A    w 12/12  ppl  10.5020   538.1s  ETA  3.51 h  sat 0.00e+00 max|x| 27.565
+k5v2-B    w 11/12  ppl  10.2994    53.9s  ETA  3.42 h  sat 0.00e+00 max|x| 27.941
+k5v2-B    w 12/12  ppl  10.5001    57.9s  ETA  3.32 h  sat 0.00e+00 max|x| 27.941
+k5v3-A    w 11/12  ppl   9.5524   532.2s  ETA  3.23 h  sat 0.00e+00 max|x| 27.897
+k5v3-A    w 12/12  ppl   9.7404   531.1s  ETA  3.14 h  sat 0.00e+00 max|x| 27.897
+k5v3-B    w 11/12  ppl   9.5454    72.0s  ETA  3.04 h  sat 0.00e+00 max|x| 28.356
+k5v3-B    w 12/12  ppl   9.7362    71.8s  ETA  2.95 h  sat 0.00e+00 max|x| 28.356
+k5v4-A    w 11/12  ppl   9.3923   532.5s  ETA  2.86 h  sat 0.00e+00 max|x| 27.773
+k5v4-A    w 12/12  ppl   9.5789   531.8s  ETA  2.77 h  sat 0.00e+00 max|x| 27.773
+k5v4-B    w 11/12  ppl   9.3949    96.8s  ETA  2.67 h  sat 0.00e+00 max|x| 27.442
+k5v4-B    w 12/12  ppl   9.5808    95.1s  ETA  2.58 h  sat 0.00e+00 max|x| 27.442
+k5v5-A    w 11/12  ppl   9.3341   538.0s  ETA  2.49 h  sat 0.00e+00 max|x| 27.687
+k5v5-A    w 12/12  ppl   9.5270   537.8s  ETA  2.40 h  sat 0.00e+00 max|x| 27.687
+k5v5-B    w 11/12  ppl   9.3341   180.1s  ETA  2.31 h  sat 0.00e+00 max|x| 27.526
+k5v5-B    w 12/12  ppl   9.5267   172.4s  ETA  2.21 h  sat 0.00e+00 max|x| 27.526
+k5v6-A    w 11/12  ppl   9.3522   541.4s  ETA  2.12 h  sat 0.00e+00 max|x| 27.617
+k5v6-A    w 12/12  ppl   9.5403   541.8s  ETA  2.03 h  sat 0.00e+00 max|x| 27.617
+k5v6-B    w 11/12  ppl   9.3414   332.7s  ETA  1.94 h  sat 0.00e+00 max|x| 27.564
+k5v6-B    w 12/12  ppl   9.5256   323.5s  ETA  1.85 h  sat 0.00e+00 max|x| 27.564
+k6v2-A    w 11/12  ppl  10.1547   534.4s  ETA  1.76 h  sat 0.00e+00 max|x| 26.608
+k6v2-A    w 12/12  ppl  10.3528   534.0s  ETA  1.67 h  sat 0.00e+00 max|x| 26.608
+k6v2-B    w 11/12  ppl  10.1282    50.0s  ETA  1.57 h  sat 0.00e+00 max|x| 27.633
+k6v2-B    w 12/12  ppl  10.3308    49.2s  ETA  1.48 h  sat 0.00e+00 max|x| 27.633
+k6v3-A    w 11/12  ppl   9.4526   536.7s  ETA  1.39 h  sat 0.00e+00 max|x| 27.704
+k6v3-A    w 12/12  ppl   9.6385   536.8s  ETA  1.29 h  sat 0.00e+00 max|x| 27.704
+k6v3-B    w 11/12  ppl   9.4437    70.9s  ETA  1.20 h  sat 0.00e+00 max|x| 27.782
+k6v3-B    w 12/12  ppl   9.6270    71.5s  ETA  1.11 h  sat 0.00e+00 max|x| 27.782
+k6v4-A    w 11/12  ppl   9.3033   536.2s  ETA  1.02 h  sat 0.00e+00 max|x| 27.607
+k6v4-A    w 12/12  ppl   9.4828   535.6s  ETA  0.92 h  sat 0.00e+00 max|x| 27.607
+k6v4-B    w 11/12  ppl   9.2991   113.1s  ETA  0.83 h  sat 0.00e+00 max|x| 27.794
+k6v4-B    w 12/12  ppl   9.4822   101.7s  ETA  0.74 h  sat 0.00e+00 max|x| 27.794
+k6v5-A    w 11/12  ppl   9.2689   530.3s  ETA  0.65 h  sat 0.00e+00 max|x| 27.776
+k6v5-A    w 12/12  ppl   9.4551   529.4s  ETA  0.55 h  sat 0.00e+00 max|x| 27.776
+k6v5-B    w 11/12  ppl   9.2652   167.7s  ETA  0.46 h  sat 0.00e+00 max|x| 27.846
+k6v5-B    w 12/12  ppl   9.4505   168.5s  ETA  0.37 h  sat 0.00e+00 max|x| 27.846
+k6v6-A    w 11/12  ppl   9.2710   534.9s  ETA  0.28 h  sat 0.00e+00 max|x| 27.603
+k6v6-A    w 12/12  ppl   9.4552   534.1s  ETA  0.18 h  sat 0.00e+00 max|x| 27.603
+k6v6-B    w 11/12  ppl   9.2548   289.8s  ETA  0.09 h  sat 0.00e+00 max|x| 27.505
+k6v6-B    w 12/12  ppl   9.4381   294.0s  ETA  0.00 h  sat 0.00e+00 max|x| 27.505
+
+config           ppl   vs base  windows  B/tok/layer       sat   max|x|   hours
+baseline      9.3895   1.0000x       12            - -- --    0.00
+k2v2-A      102.1468  10.8788x       12          288  0.00e+00   34.329    1.75
+k2v2-B      103.3080  11.0025x       12          288  0.00e+00   32.777    0.19
+k2v3-A       91.4258   9.7370x       12          352  0.00e+00   31.491    1.76
+k2v3-B       91.7121   9.7675x       12          352  0.00e+00   30.843    0.44
+k2v4-A       84.2349   8.9712x       12          416  0.00e+00   32.422    1.78
+k2v4-B       85.3821   9.0934x       12          416  0.00e+00   32.276    0.34
+k2v5-A       83.3800   8.8801x       12          480  0.00e+00   33.670    1.78
+k2v5-B       82.7317   8.8111x       12          480  0.00e+00   34.001    0.57
+k2v6-A       82.4657   8.7828x       12          544  0.00e+00   31.777    1.79
+k2v6-B       83.5500   8.8982x       12          544  0.00e+00   34.259    0.99
+k3v2-A       14.6583   1.5611x       12          352  0.00e+00   30.227    1.80
+k3v2-B       14.6055   1.5555x       12          352  0.00e+00   31.135    0.19
+k3v3-A       13.0430   1.3891x       12          416  0.00e+00   30.479    1.77
+k3v3-B       13.0365   1.3884x       12          416  0.00e+00   29.693    0.24
+k3v4-A       12.6855   1.3510x       12          480  0.00e+00   29.448    1.78
+k3v4-B       12.6456   1.3468x       12          480  0.00e+00   29.948    0.35
+k3v5-A       12.4893   1.3301x       12          544  0.00e+00   29.006    1.76
+k3v5-B       12.5388   1.3354x       12          544  0.00e+00   30.024    0.57
+k3v6-A       12.4504   1.3260x       12          608  0.00e+00   31.582    1.77
+k3v6-B       12.6234   1.3444x       12          608  0.00e+00   29.836    1.01
+k4v2-A       11.0146   1.1731x       12          416  0.00e+00   27.734    1.78
+k4v2-B       11.1043   1.1826x       12          416  0.00e+00   27.155    0.19
+k4v3-A       10.1944   1.0857x       12          480  0.00e+00   27.767    1.78
+k4v3-B       10.1830   1.0845x       12          480  0.00e+00   28.179    0.23
+k4v4-A       10.0136   1.0665x       12          544  0.00e+00   27.567    1.78
+k4v4-B       10.0084   1.0659x       12          544  0.00e+00   27.896    0.36
+k4v5-A        9.9556   1.0603x       12          608  0.00e+00   28.427    1.77
+k4v5-B        9.9409   1.0587x       12          608  0.00e+00   28.026    0.56
+k4v6-A       10.0084   1.0659x       12          672  0.00e+00   28.410    1.82
+k4v6-B        9.9738   1.0622x       12          672  0.00e+00   28.783    0.99
+k5v2-A       10.5020   1.1185x       12          480  0.00e+00   27.565    1.78
+k5v2-B       10.5001   1.1183x       12          480  0.00e+00   27.941    0.19
+k5v3-A        9.7404   1.0374x       12          544  0.00e+00   27.897    1.77
+k5v3-B        9.7362   1.0369x       12          544  0.00e+00   28.356    0.24
+k5v4-A        9.5789   1.0202x       12          608  0.00e+00   27.773    1.78
+k5v4-B        9.5808   1.0204x       12          608  0.00e+00   27.442    0.34
+k5v5-A        9.5270   1.0146x       12          672  0.00e+00   27.687    1.82
+k5v5-B        9.5267   1.0146x       12          672  0.00e+00   27.526    0.57
+k5v6-A        9.5403   1.0161x       12          736  0.00e+00   27.617    1.77
+k5v6-B        9.5256   1.0145x       12          736  0.00e+00   27.564    0.98
+k6v2-A       10.3528   1.1026x       12          544  0.00e+00   26.608    1.77
+k6v2-B       10.3308   1.1003x       12          544  0.00e+00   27.633    0.19
+k6v3-A        9.6385   1.0265x       12          608  0.00e+00   27.704    1.77
+k6v3-B        9.6270   1.0253x       12          608  0.00e+00   27.782    0.24
+k6v4-A        9.4828   1.0099x       12          672  0.00e+00   27.607    1.78
+k6v4-B        9.4822   1.0099x       12          672  0.00e+00   27.794    0.39
+k6v5-A        9.4551   1.0070x       12          736  0.00e+00   27.776    1.78
+k6v5-B        9.4505   1.0065x       12          736  0.00e+00   27.846    0.55
+k6v6-A        9.4552   1.0070x       12          800  0.00e+00   27.603    1.81
+k6v6-B        9.4381   1.0052x       12          800  0.00e+00   27.505    0.96

@@ -1,0 +1,913 @@
+"""Attention that never decompresses.
+
+The idea
+--------
+A cached key is stored as `norm * centroid[code]` in the rotated space. The
+usual thing to do is rebuild that dense vector and then dot it with the query.
+This does not:
+
+    <q, k>  =  <R q, R k>                      R is orthonormal
+            =  <rq, norm * centroid[code]>
+            =  norm * sum_j rq[j] * centroid[code[j]]
+
+so the dot product runs straight on the codes. The query is rotated once per
+step, no cached token is ever touched by a rotation, and no dense key or value
+is ever built. That is the whole architecture in three lines.
+
+The same thing works on the value side, which is why the output stays in the
+rotated space and `R^-1` gets folded into `W_o` offline instead of being
+applied to every token.
+
+Why there are two softmaxes here
+--------------------------------
+`attend_online` is what the hardware runs: one pass over the cache, a running
+maximum, and a rescale of the accumulator whenever that maximum moves. It reads
+the cache exactly once, which is the only thing that matters when the cache
+lives off-die.
+
+`attend_two_pass` computes all the scores first, takes the global maximum, and
+then accumulates. Same arithmetic, but there is no rescale and so no rescale
+truncation -- and it vectorises, which makes it orders of magnitude faster in
+Python.
+
+They are not bit-identical, and that is not a bug: the online form truncates
+the accumulator once per rescale. Keeping both turns the difference into a
+number we measure rather than a claim in a comment -- it shows up as
+`AttentionStats.rescale_events`, and `tests/test_attention.py` pins it with
+`check_online_and_two_pass_are_close_but_not_identical` and
+`check_online_and_two_pass_differ_only_by_rescale_truncation`.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+import numpy as np
+
+from ..config import FixedFormat, QuantConfig
+from ..numerics.fixed import INT, Q, absmax, rshift
+from ..trace import Op, Trace, record
+from .quantize import CompressedKV, KVQuantizer
+
+FLOAT64_EXACT = 1 << 53
+
+
+def exact_int_matmul(a, b, b_absmax: int | None = None) -> np.ndarray:
+    """Integer matrix product done in float64 BLAS, exactly.
+
+    numpy has no BLAS path for int64. A 512-cube int64 matmul runs at 1.1
+    GFLOP/s on this machine against 474 GFLOP/s for float64 -- a factor of 427,
+    which is the difference between a 4096-context sweep taking hours and
+    taking days.
+
+    float64 holds every integer below 2^53 exactly, and adding or multiplying
+    two exactly-held integers is exact as long as the result is also below
+    2^53. So this is not "accurate enough": it is the same integer, bit for
+    bit.
+
+    The bound is checked rather than assumed. `max|a| * max|b| * k` is the
+    worst case, with every term at full magnitude and the same sign. Going over
+    it raises instead of quietly returning a rounded answer. That is the one
+    way this trick fails, and it would be invisible downstream.
+    """
+    a = np.asarray(a, dtype=INT)
+    b = np.asarray(b, dtype=INT)
+    k = a.shape[-1]
+    bound = absmax(a) * (b_absmax if b_absmax is not None else absmax(b)) * k
+    if bound >= FLOAT64_EXACT:
+        raise OverflowError(
+            f"exact_int_matmul: worst-case magnitude {bound} >= 2^53, so float64 "
+            f"would round. Reduce the reduction length ({k}) or narrow the "
+            f"operands; do NOT relax this check."
+        )
+    return (a.astype(np.float64) @ b.astype(np.float64)).astype(INT)
+
+
+# --------------------------------------------------------------------------
+# exp(-x) without a divider or a series
+# --------------------------------------------------------------------------
+
+class ExpLut:
+    """`exp(-x)` as `2^-i * 2^-f`: a table for the fraction, a shift for the integer.
+
+    `x` arrives in Q(acc_frac) and is always non-negative -- every call site
+    passes a distance below a running maximum. Converting to base 2 turns the
+    integer part into a shift, so the table only has to cover `[0, 1)` and stays
+    `2**lut_bits` entries no matter how large `x` gets.
+
+    A series expansion would need several multiplies and would still be wrong in
+    the tail. A table over the whole range would be enormous. This is the
+    standard split between the two, and it is exact to within one LSB of
+    Q(prob_frac).
+    """
+
+    def __init__(self, fmt: FixedFormat) -> None:
+        self.fmt = fmt
+        n = 1 << fmt.exp_lut_bits
+        frac = np.arange(n, dtype=np.float64) / n
+        self.table = np.rint(2.0 ** (-frac) * (1 << fmt.prob_frac)).astype(INT)
+        # log2(e) in Q(acc_frac), used to convert exp(-x) into 2^(-x*log2e).
+        self.log2e = INT(round(np.log2(np.e) * (1 << fmt.acc_frac)))
+        # Beyond this the result is zero at Q(prob_frac) and the shift would
+        # be undefined; clamping here is exact, not an approximation.
+        self.max_int_part = fmt.prob_frac + 1
+
+        # One flat table instead of a table plus a shift.
+        #
+        # The result is `table[addr] >> i`, where `addr` is the low
+        # `exp_lut_bits` of `t >> (acc_frac - exp_lut_bits)` and `i` is what is
+        # left. So it depends on that one quantity and nothing else, which means
+        # the whole thing collapses into a single gather over
+        # `(max_int_part + 1) << exp_lut_bits` entries -- 4,608 int64s, 37 KB.
+        #
+        # This is not an approximation. Every entry is computed from the exact
+        # expression above, and `check_exp_lut_flat_matches_two_step` asserts the
+        # two forms agree on every input that can actually occur. It is worth
+        # doing because the two-step version was 28% of total runtime: eight
+        # passes over a 17-million-element array where one gather does.
+        self._shift = fmt.acc_frac - fmt.exp_lut_bits
+        span = (self.max_int_part + 1) << fmt.exp_lut_bits
+        self._span = span
+
+        # The input is clamped, and it has to be.
+        #
+        # `delta * log2e` overflows int64 once delta gets past about 2^47, and a
+        # caller reaches that easily: mask a score to the format's floor,
+        # subtract it from a running maximum, and there it is. The old two-step
+        # form wrapped silently and got away with it, because every caller threw
+        # the masked lanes away afterwards -- a wrong answer that nobody ever
+        # read. The flat gather turns the same input into an out-of-bounds
+        # index, which is how this was found.
+        #
+        # The clamp is exact rather than a safety net. Every delta at or above
+        # this bound maps to the table's final zero entry, so clamping cannot
+        # change a result, and callers no longer need to mask the output.
+        self._delta_max = INT(-(-((span << self._shift) << fmt.acc_frac)
+                                // int(self.log2e)))
+        u = np.arange(span + 1, dtype=INT)
+        flat = self.table[u[:span] & (n - 1)] >> np.minimum(
+            u[:span] >> fmt.exp_lut_bits, self.max_int_part)
+        flat[(u[:span] >> fmt.exp_lut_bits) > self.max_int_part] = 0
+        self._flat = np.concatenate([flat, np.zeros(1, dtype=INT)])
+
+    def __call__(self, delta) -> np.ndarray:
+        """`round(2^prob_frac * exp(-delta / 2^acc_frac))` for delta >= 0."""
+        d = np.minimum(np.asarray(delta, dtype=INT), self._delta_max)
+        if np.any(d < 0):
+            raise ValueError("ExpLut expects a non-negative distance below the running max")
+        t = rshift(d * self.log2e, self.fmt.acc_frac)          # x*log2(e), Q(acc_frac)
+        return self._flat[np.minimum(t >> self._shift, self._span)]
+
+    def two_step(self, delta) -> np.ndarray:
+        """The unflattened form. The reference `__call__` is checked against."""
+        d = np.minimum(np.asarray(delta, dtype=INT), self._delta_max)
+        t = rshift(d * self.log2e, self.fmt.acc_frac)
+        i = rshift(t, self.fmt.acc_frac)
+        f = t & ((INT(1) << self.fmt.acc_frac) - 1)
+        addr = rshift(f, self.fmt.acc_frac - self.fmt.exp_lut_bits)
+        p = self.table[addr] >> np.minimum(i, self.max_int_part)
+        return np.where(i > self.max_int_part, INT(0), p)
+
+
+# The denominator's register width, from `finalize.sv`'s `L_WIDTH`. The
+# normalised reciprocal's shift can never exceed it.
+L_WIDTH = 48
+
+
+def _lead(l: np.ndarray) -> np.ndarray:
+    """Position of `l`'s leading one, 0 for zero. A priority encoder in RTL."""
+    a = np.asarray(l, dtype=INT)
+    n = np.zeros_like(a)
+    for b in range(1, L_WIDTH):
+        n = np.where(a >= (INT(1) << b), INT(b), n)
+    return n
+
+
+# The width `l` is normalised into before the divide, and the numerator that
+# makes the quotient exactly one bit narrower than it. Both are constants, so
+# the divider is fixed-width -- which is what makes it cheap in hardware.
+#
+# This must equal `FixedFormat.recip_norm_bits` and `RECIP_BITS` in
+# `rtl/finalize.sv`. `check_the_reciprocal_width_is_one_number_everywhere`
+# pins all three together.
+RECIP_NORM_BITS = 32
+RECIP_NUM_SHIFT = 2 * RECIP_NORM_BITS - 2        # 62, so the quotient is 31 bits
+
+
+def reciprocal(l, fmt: FixedFormat):
+    """`1/l`, normalised. Returns `(recip, shift)` with `out = (acc*recip) >> shift`.
+
+    Why this is not a fixed Q16 divide any more
+    -------------------------------------------
+    It used to be `floor(2**31 / l)` at a fixed `recip_frac`, and that loses
+    precision linearly in context. The online denominator comes out at
+    `l = T * 2**15` to within 0.2%, because attention is close to uniform and
+    every `p` is close to one. So the old quotient was just `2**16 / T`: 64
+    levels at context 1,024, 8 at 8,192, 2 at 32,768, 1 at 65,536, and zero at
+    131,072, where the output became identically zero.
+
+    The error was also a lottery, which made it much harder to notice. It is the
+    fractional part of `2**31/l`, so at powers of two `l` lands just above an
+    integer and the error is 0.2%, while at context 24,576 it is 25%. Every
+    context this project had tested -- 32, 64, 256, 1,024, 4,096 -- is a power of
+    two, so every measurement had been taken on a winning ticket. Checking
+    bit-exactness against the hardware could not catch it either, because
+    `finalize.sv` did the same divide and was wrong in the same way.
+
+    We normalise the divisor, not the numerator
+    -------------------------------------------
+    The obvious fix is to scale the numerator by `l`'s leading bit. That
+    overflows a 64-bit integer at context 262,144, which is inside the range
+    this is supposed to rescue.
+
+    So instead `l` is shifted into a fixed 32-bit window -- left when it is
+    small, right when it is large -- and the numerator stays the constant
+    `2**62`. The quotient then always lands in `(2**30, 2**31]`, which is 31
+    significant bits at every context with no ceiling, and `acc * recip` stays
+    inside 64 bits because both factors are bounded by construction.
+
+    That is also the shape the RTL wants: a fixed-width divisor and a constant
+    dividend, which is the divider `finalize.sv` already has.
+
+    The value itself does not change -- it is still `acc * 2**prob_frac / l`.
+    What changes is the precision it is carried at, which no longer depends on
+    the context.
+
+    `l = 0` is a real input, because a masked position scores nothing. It
+    answers `(0, shift)` and gives the zero vector, same as before.
+    """
+    a = np.asarray(l, dtype=INT)
+    s = _lead(a)
+    # `k` says where `l`'s leading one sits relative to the window. Negative
+    # means `l` is small and has to be shifted up. The shift returned below is
+    # the total one, so a negative `k` just makes it smaller; its floor is
+    # `16 + s`, so it never goes negative and `rshift` is never handed a left
+    # shift.
+    k = s - (RECIP_NORM_BITS - 1)
+    l_n = np.where(k >= 0, a >> np.maximum(k, 0), a << np.maximum(-k, 0))
+    num = INT(1) << RECIP_NUM_SHIFT
+    r = np.where(a > 0, num // np.maximum(l_n, INT(1)), INT(0))
+    return r, RECIP_NUM_SHIFT - fmt.prob_frac + k
+
+
+# --------------------------------------------------------------------------
+# stats
+# --------------------------------------------------------------------------
+
+@dataclass
+class AttentionStats:
+    """What the step did, collected while it ran rather than worked out after."""
+
+    n_tokens: int = 0
+    rescale_events: int = 0
+    score_overflows: int = 0
+    acc_overflows: int = 0
+    max_abs_score: int = 0
+    max_abs_acc: int = 0
+
+    def merge(self, other: "AttentionStats") -> None:
+        self.n_tokens = max(self.n_tokens, other.n_tokens)
+        self.rescale_events += other.rescale_events
+        self.score_overflows += other.score_overflows
+        self.acc_overflows += other.acc_overflows
+        self.max_abs_score = max(self.max_abs_score, other.max_abs_score)
+        self.max_abs_acc = max(self.max_abs_acc, other.max_abs_acc)
+
+
+# --------------------------------------------------------------------------
+# the datapath
+# --------------------------------------------------------------------------
+
+class CompressedAttention:
+    """Scores and accumulates directly on codes, for one KV head's cache.
+
+    Holds no state between calls. `q_rot` has to arrive rotated and already
+    scaled by `1/sqrt(head_dim)`. Folding that scale into the query means the
+    softmax needs no multiply of its own -- worth doing because there is one
+    query vector per step but one score per cached token.
+    """
+
+    def __init__(self, quantizer: KVQuantizer, fmt: FixedFormat, quant: QuantConfig) -> None:
+        self.z = quantizer
+        self.fmt = fmt
+        self.quant = quant
+        self.exp = ExpLut(fmt)
+        self.score_shift = fmt.score_shift_for(quant)
+        self.acc_shift = fmt.acc_shift_for(quant)
+        # 2^-acc_shift as an exact float64 power of two, so the float
+        # accumulate's truncation is the integer shift and not an approximation.
+        self._acc_scale = 2.0 ** -self.acc_shift
+        self.score_q = Q(fmt.score_width, fmt.acc_frac, fmt.saturate)
+        self.acc_q = Q(fmt.acc_width, fmt.acc_frac, fmt.saturate)
+
+        # An observer on the online loop, used by `hw/vectors.py`. Same
+        # contract as `AttentionKernel.on_stage`: guarded by `is not None`,
+        # handed copies, and read-only. `softmax_online.sv` and `accum.sv` need
+        # the running `m`, `l` and `acc` for each token, and the only other way
+        # to get them would be to write the recurrence a second time in the
+        # vector generator -- which is the thing these files exist to avoid.
+        self.on_step = None
+
+        # Which of the two architectures to run.
+        #
+        #   "fused"  (B) sum q.centroid across the row, one multiply by the
+        #               norm, one shift. No dense key is ever built. This is
+        #               the design, and the only mode with hardware behind it.
+        #   "dense"  (A) rebuild the dense key in Q(qk_frac), then dot it. The
+        #               modular design a compressed format implies when you
+        #               read it as a specification: a decompressor feeding a
+        #               conventional attention unit.
+        #
+        # The two compute the same inner product and differ only in where the
+        # arithmetic happens, which is the comparison the paper is about.
+        self.score_mode = "fused"
+        self._q_unrot = None
+
+        # `rotate(RoPE_t(b_k))` per cached token, or None when the key bias is
+        # not being folded. See `AttentionKernel.fold_k_bias`: when the cache
+        # holds `W_k x` rather than `W_k x + b_k`, the score is short by
+        # `<q, rotate(RoPE_t(b_k))>` and this is what puts it back.
+        self._bias_rot = None
+        # Counts calls into A. `attend_causal_batch` inlines its own scoring
+        # and never reaches `scores()`, so a harness that selects A and then
+        # takes the batched path would silently measure B and report two
+        # identical numbers. The harness asserts on this.
+        self.baseline_calls = 0
+
+    # -- scoring -----------------------------------------------------------
+
+    def scores(self, q_rot: np.ndarray, kv: CompressedKV,
+               trace: Trace | None = None) -> tuple[np.ndarray, int]:
+        """All scores for one query against `T` cached tokens, in Q(acc_frac).
+
+        `q_rot` is (..., d), `kv.k_idx` is (T, d), and the result is (..., T).
+
+        The planes are summed before the one shift. Shifting each term on its
+        own would truncate each one separately, and that can come out a count
+        away from a datapath that shifts once -- which is what the hardware
+        does.
+        """
+        centroids = self.z.key.codebook.centroids
+        codes = centroids[kv.k_idx.astype(INT)]                 # (T, d) Q(centroid_frac)
+        norm = kv.k_norm.astype(INT)
+        q = np.asarray(q_rot, dtype=INT)
+
+        if self.score_mode == "fused":
+            # Sum first, one norm multiply, one shift. No dense key is built.
+            dot = np.einsum("...j,tj->...t", q, codes)
+            s = rshift(dot * norm, self.score_shift)
+        else:
+            s = self._scores_baseline(q, codes, norm, kv, trace)
+        bias = self._bias_term(q, kv.k_idx.shape[0])
+        if bias is not None:
+            s = s + bias
+        overflow = self.score_q.overflow_count(s)
+        s = self.score_q.clamp(s)
+        record(trace, Op.SCORE, "attention", m=self.z.d, k=1,
+               n=int(np.prod(np.shape(s))))
+        return s, overflow
+
+    def _scores_baseline(self, q, codes, norm, kv, trace=None):
+        """Architecture A: decompress a cached key all the way back.
+
+        A reads the format as a specification. Its decode rule reconstructs the
+        original vector -- codes to centroids, scaled by the norm, then rotated
+        back out of the rotated basis -- so the attention unit downstream sees
+        ordinary keys and knows nothing about codebooks or rotations. That is
+        the clean interface, and this is what it costs:
+
+            rebuild   d multiplies, and a truncation from Q(threshold_frac)
+                      into Q(qk_frac) on every one of the d channels
+            unrotate  d log d add/sub, ending in another truncation
+            dot       d multiplies against the unrotated query
+
+        all of it per cached token. B pays none of it: it never leaves the
+        rotated basis, and the inverse it would need is folded into `W_o`
+        offline instead.
+
+        Because A lands in the original basis, its output must go through the
+        unfolded `W_o`. The kernel handles that; see `Weights.o_unrotated`.
+        """
+        if self.score_mode != "dense":
+            raise ValueError(
+                f"unknown score_mode {self.score_mode!r}; expected "
+                f"'fused' (B) or 'dense' (A)")
+        if self._q_unrot is None:
+            raise ValueError(
+                "architecture A scores in the original basis and needs the "
+                "pre-rotation query; the kernel supplies it before attending")
+        self.baseline_calls += 1
+
+        fmt = self.fmt
+        k_orig = self.z.rotation.inverse_apply(
+            rshift(codes * norm[:, None], self.z.key.threshold_frac - fmt.qk_frac),
+            trace, "unrotate")
+        qu = np.asarray(self._q_unrot, dtype=INT).reshape(np.shape(q))
+        return rshift(np.einsum("...j,tj->...t", qu, k_orig),
+                      2 * fmt.qk_frac - fmt.acc_frac)
+
+    def _bias_term(self, q_rot, n_tok: int) -> np.ndarray | None:
+        """`<q, rotate(RoPE_t(b_k))>` in Q(acc_frac), or None when not folding.
+
+        Both operands are Q(qk_frac), so the product is Q(2*qk_frac) and one
+        shift lands it beside the score -- the same single-truncation rule
+        `_scores_baseline` uses, and for the same reason: shifting each term
+        on its own would truncate `d` times where the datapath truncates once.
+        """
+        if self._bias_rot is None:
+            return None
+        b = np.asarray(self._bias_rot[:n_tok], dtype=INT)
+        q = np.asarray(q_rot, dtype=INT)
+        return rshift(np.einsum("...j,tj->...t", q, b),
+                      2 * self.fmt.qk_frac - self.fmt.acc_frac)
+
+    def _accumulate_terms(self, p: np.ndarray, kv: CompressedKV,
+                          trace: Trace | None = None) -> np.ndarray:
+        """`(norm * prob * centroid) >> acc_shift`, one truncation per term.
+
+        Each term is truncated before it joins the running sum, not after. That
+        is what lets a vectorised sum equal a sequential one -- truncating the
+        sum instead would depend on what order the terms arrived in.
+        """
+        centroids = self.z.value.codebook.centroids
+        if self.score_mode == "dense":
+            # A decompresses the value the same way it decompressed the key:
+            # all the way back to the original basis. The accumulator is then
+            # in that basis and needs no correction afterwards -- which is the
+            # whole point of the interface, and the reason it costs a rotation
+            # per cached token.
+            fmt = self.fmt
+            v_orig = self.z.rotation.inverse_apply(
+                rshift(centroids[kv.v_idx.astype(INT)]
+                       * kv.v_norm.astype(INT)[:, None],
+                       self.z.value.threshold_frac - fmt.qk_frac), trace, "unrotate")
+            return rshift(p[..., None] * v_orig,
+                          fmt.prob_frac + fmt.qk_frac - fmt.acc_frac)
+
+        v_hat = centroids[kv.v_idx.astype(INT)]                  # (T, d)
+        weight = kv.v_norm.astype(INT)[..., None] * p[..., None]  # (..., T, 1)
+        return rshift(weight * v_hat, self.acc_shift)             # (..., T, d)
+
+    # -- the two softmaxes -------------------------------------------------
+
+    def attend_two_pass(self, q_rot: np.ndarray, kv: CompressedKV,
+                        trace: Trace | None = None
+                        ) -> tuple[np.ndarray, AttentionStats]:
+        """Global maximum, then one accumulation. Vectorised; no rescale."""
+        s, ovf = self.scores(q_rot, kv, trace)
+        stats = AttentionStats(n_tokens=s.shape[-1], score_overflows=ovf,
+                               max_abs_score=int(np.abs(s).max(initial=0)))
+
+        m = s.max(axis=-1, keepdims=True)
+        p = self.exp(m - s)                                       # Q(prob_frac)
+        l = p.sum(axis=-1)                                        # Q(prob_frac)
+
+        terms = self._accumulate_terms(p, kv, trace)
+        acc = terms.sum(axis=-2)
+        stats.acc_overflows = self.acc_q.overflow_count(acc)
+        acc = self.acc_q.clamp(acc)
+        stats.max_abs_acc = int(np.abs(acc).max(initial=0))
+
+        record(trace, Op.SOFTMAX, "attention", m=1, n=int(np.prod(l.shape)))
+        record(trace, Op.ACCUMULATE, "attention", m=self.z.d, n=int(np.prod(p.shape)))
+        return self._finalize(acc, l), stats
+
+    def attend_online(self, q_rot: np.ndarray, kv: CompressedKV,
+                      trace: Trace | None = None
+                      ) -> tuple[np.ndarray, AttentionStats]:
+        """One streaming pass with a running maximum, rescaling when it moves.
+
+        This is the hardware's order and the hardware's truncation pattern. The
+        cache gets read exactly once, which is the property that matters when it
+        lives off-die.
+        """
+        if self.score_mode != "fused":
+            raise ValueError(
+                f"attend_online inlines the fused value path and ignores score_mode; "
+                "architecture A would get its scores in the original basis and "
+                "its values in the rotated one, and the mixed-basis accumulator "
+                "would go through the unfolded W_o as plausible nonsense. Use "
+                "attend_two_pass for A.")
+        s, ovf = self.scores(q_rot, kv, trace)
+        s = np.atleast_2d(s)                                      # (H, T)
+        n_heads, n_tok = s.shape
+        stats = AttentionStats(n_tokens=n_tok, score_overflows=ovf,
+                               max_abs_score=int(np.abs(s).max(initial=0)))
+
+        d = self.z.d
+        acc = np.zeros((n_heads, d), dtype=INT)
+        l = np.zeros(n_heads, dtype=INT)
+        m = np.full(n_heads, self.score_q.lo, dtype=INT)
+        unity = INT(1) << self.fmt.prob_frac
+
+        v_centroids = self.z.value.codebook.centroids
+        for t in range(n_tok):
+            st = s[:, t]
+            grew = st > m
+            if grew.any():
+                # exp(-(new_max - old_max)) pulls everything summed so far down
+                # onto the new scale. This is rare in practice, so the hardware
+                # can afford to stall here instead of carrying a permanent
+                # d-wide multiplier for it.
+                delta = np.where(grew, st - m, 0)
+                factor = np.where(grew, self.exp(delta), unity)
+                acc = rshift(acc * factor[:, None], self.fmt.prob_frac)
+                l = rshift(l * factor, self.fmt.prob_frac)
+                m = np.where(grew, st, m)
+                stats.rescale_events += int(grew.sum())
+                record(trace, Op.RESCALE, "attention", m=d, n=int(grew.sum()))
+
+            p = self.exp(m - st)
+            l = l + p
+            v_hat = v_centroids[kv.v_idx[t].astype(INT)]
+            acc = acc + rshift(
+                (kv.v_norm[t].astype(INT) * p)[:, None] * v_hat, self.acc_shift
+            )
+            stats.acc_overflows += self.acc_q.overflow_count(acc)
+            acc = self.acc_q.clamp(acc)
+
+            if self.on_step is not None:
+                self.on_step(t, s=st, m=m, p=p, l=l, acc=acc,
+                             grew=grew, factor=factor if grew.any() else None)
+
+        stats.max_abs_acc = int(np.abs(acc).max(initial=0))
+        record(trace, Op.SOFTMAX, "attention", m=1, n=n_heads * n_tok)
+        record(trace, Op.ACCUMULATE, "attention", m=d, n=n_heads * n_tok)
+        out = self._finalize(acc, l)
+        return out.reshape(np.shape(q_rot)[:-1] + (d,)), stats
+
+    # -- the batched causal path -------------------------------------------
+
+    def attend_causal_batch(self, q_rot: np.ndarray, kv: CompressedKV,
+                            base: int = 0, tile: int = 256,
+                            trace: Trace | None = None
+                            ) -> tuple[np.ndarray, AttentionStats]:
+        """Every query token of a prefill against one KV head, in one pass.
+
+        `q_rot` is (n_q, heads, d), query token `i` attends cache tokens
+        `[0, base + i]`, and the result is (n_q, heads, d).
+
+        This does not change the modelled hardware. It is an evaluation
+        strategy, not a datapath: the caller still emits one MEM_READ per query
+        token, so the trace -- and with it every byte, cycle and energy figure --
+        comes out identical to the token-at-a-time path. Keeping those two things
+        separate is what `trace.py` is for.
+        `tests/test_attention.py::check_causal_batch_is_bit_identical` pins the
+        values and `test_kernel.py::check_batching_does_not_change_the_trace`
+        pins the accounting.
+
+        `tile` only bounds peak memory. It is not a query tile in the hardware
+        sense and must not be reported as one.
+
+        The accumulate cannot be a plain matmul, because each term is truncated
+        before it joins the sum and that ordering is load-bearing. Instead it is
+        split over the `2**value_bits` distinct centroids: within one code value
+        every term shares a multiplier, so the truncation can happen first and
+        what is left is a 0/1 matrix product. Exact, and it costs
+        `2**value_bits` BLAS calls rather than one enormous elementwise
+        temporary.
+        """
+        if self.score_mode != "fused":
+            raise ValueError(
+                f"attend_causal_batch inlines the fused value path and ignores score_mode; "
+                "architecture A would get its scores in the original basis and "
+                "its values in the rotated one, and the mixed-basis accumulator "
+                "would go through the unfolded W_o as plausible nonsense. Use "
+                "attend_two_pass for A.")
+        q = np.asarray(q_rot, dtype=INT)
+        if q.ndim == 2:
+            q = q[:, None, :]
+        n_q, heads, d = q.shape
+        n_tok = kv.k_idx.shape[0]
+
+        k_hat = self.z.key.codebook.centroids[kv.k_idx.astype(INT)]   # (T, d)
+        k_hat_max = absmax(k_hat)
+        k_norm = kv.k_norm.astype(INT)
+        v_norm_f = kv.v_norm.astype(np.float64)
+        v_cent = self.z.value.codebook.centroids
+        v_cent_max = absmax(v_cent)
+        # Everything the exactness guards need, computed once for the whole
+        # batch rather than once per tile per code value. A guard that walks the
+        # array it is guarding costs more than the work it protects.
+        score_scale = 2.0 ** -self.score_shift
+        k_norm_f = kv.k_norm.astype(np.float64)
+        k_norm_max = absmax(kv.k_norm)
+        # 0/1 selector per value code, built once for the whole batch.
+        selector = [(kv.v_idx == v).astype(np.float64)
+                    for v in range(self.z.value.codebook.size)]
+
+        out = np.empty((n_q, heads, d), dtype=INT)
+        stats = AttentionStats(n_tokens=n_tok)
+        positions = np.arange(n_tok)
+
+        for lo in range(0, n_q, tile):
+            hi = min(lo + tile, n_q)
+            nt = hi - lo
+
+            qt = q[lo:hi].reshape(-1, d)
+            q_max = absmax(qt)
+            if q_max * k_hat_max * d >= FLOAT64_EXACT:
+                raise OverflowError(
+                    f"score: |q|*|k_hat|*d = {q_max * k_hat_max * d} >= 2^53")
+            dot_f = qt.astype(np.float64) @ k_hat.T.astype(np.float64)
+
+            # The score truncation runs in float64 too, whenever the operands
+            # prove that is exact -- which is the ordinary case, because
+            # `dot * k_norm` is an exact float64 integer below 2^53 and the
+            # shift is a power-of-two scale. The int64 fallback stays because
+            # the bound depends on the data and not only on the format, so it
+            # can genuinely be reached.
+            if q_max * k_hat_max * d * k_norm_max < FLOAT64_EXACT:
+                s = np.floor((dot_f * k_norm_f) * score_scale).astype(INT)
+            else:
+                s = rshift(dot_f.astype(INT) * k_norm, self.score_shift)
+            bias = self._bias_term(qt, n_tok)
+            if bias is not None:
+                s = s + bias
+            s, ovf, peak = self.score_q.check_and_clamp(s)
+            stats.score_overflows += ovf
+            stats.max_abs_score = max(stats.max_abs_score, peak)
+            s = s.reshape(nt, heads, n_tok)
+
+            # Causal mask. Invalid entries are pinned to the format's floor, so
+            # the running maximum only ever sees the causal prefix. Their
+            # probability then comes out at exactly zero and contributes
+            # nothing.
+            valid = (positions[None, :] <= (base + np.arange(lo, hi))[:, None])
+            s = np.where(valid[:, None, :], s, self.score_q.lo)
+
+            # Masked lanes sit far enough below the running maximum that
+            # `ExpLut`'s clamp maps them to exactly zero, so there is no need
+            # for a second masking pass. More importantly, no lane ever reaches
+            # the exp with a delta large enough to overflow.
+            m = s.max(axis=-1, keepdims=True)
+            p = self.exp(m - s)
+            l = p.sum(axis=-1)
+
+            # The accumulate runs in float64 from here, and it is exact.
+            #
+            # `rshift(x, s)` is `floor(x / 2^s)`. In float64 `w * c` is an exact
+            # integer as long as it stays under 2^53, and scaling by 2^-s is
+            # exact because the scale is a power of two. So `floor((w*c) * 2^-s)`
+            # is the same integer the int64 shift would give, and it feeds the
+            # matmul without a conversion.
+            #
+            # The int64 path cost a multiply, a shift and an astype over a
+            # 17-million-element array per code value. This costs a multiply and
+            # a floor. The bound is checked rather than assumed, the same way
+            # `exact_int_matmul` does it.
+            w = p.reshape(-1, n_tok).astype(np.float64) * v_norm_f
+            w_max = absmax(p) * absmax(kv.v_norm)
+            if w_max * v_cent_max >= FLOAT64_EXACT:
+                raise OverflowError(
+                    f"accumulate: |w|*|c| = {w_max * v_cent_max} >= 2^53, so the "
+                    f"float64 truncation would not match the integer shift"
+                )
+            # |term| <= |w|*|c|*2^-shift, bounded analytically rather than by
+            # walking the array once per code value.
+            if w_max * v_cent_max * self._acc_scale * n_tok >= FLOAT64_EXACT:
+                raise OverflowError(
+                    f"accumulate: the reduction over {n_tok} tokens exceeds 2^53; "
+                    f"lower `tile` will not help"
+                )
+            # Scale once rather than once per code. `w * 2^-acc_shift` is
+            # exact, because a power-of-two scale never rounds, so
+            # `floor(w_s * c)` is the same integer as
+            # `floor((w * c) * 2^-acc_shift)` -- but it is one multiply per code
+            # instead of two. Worth it: building these terms costs about four
+            # times what the matmuls that consume them cost.
+            w_s = w * self._acc_scale
+            acc = np.zeros((nt * heads, d), dtype=np.float64)
+            for v, sel in enumerate(selector):
+                acc += np.floor(w_s * float(v_cent[v])) @ sel
+            acc, ovf, peak = self.acc_q.check_and_clamp(acc.astype(INT))
+            stats.acc_overflows += ovf
+            stats.max_abs_acc = max(stats.max_abs_acc, peak)
+            acc = acc.reshape(nt, heads, d)
+            out[lo:hi] = self._finalize(acc, l)
+
+        # These are the causal counts, not the rectangular ones. Query token i
+        # scores against base+i+1 cached tokens rather than all n_tok. The batch
+        # computes a full rectangle and masks it, but the design being modelled
+        # only does the triangle, and the trace describes the design.
+        causal = heads * sum(base + i + 1 for i in range(n_q))
+        record(trace, Op.SCORE, "attention", m=d, n=causal)
+        record(trace, Op.SOFTMAX, "attention", m=1, n=n_q * heads)
+        record(trace, Op.ACCUMULATE, "attention", m=d, n=causal)
+        return out.reshape(np.shape(q_rot)), stats
+
+    def attend_causal_batch_dense(self, q_rot: np.ndarray, kv: CompressedKV,
+                                  base: int = 0, tile: int = 256, kchunk: int = 256,
+                                  trace: Trace | None = None
+                                  ) -> tuple[np.ndarray, AttentionStats]:
+        """Architecture A's `attend_causal_batch`: decode the cache once.
+
+        The token-at-a-time path (`attend_two_pass`, called once per query from
+        `Kernel._attend_one`) re-derives `k_orig`/`v_orig` from scratch at every
+        step, because `kv.select(slice(0, ctx))` hands it a growing prefix each
+        time. Decoding token 0 happens `n_q` times over a window instead of
+        once -- the whole cache is dequantized and unrotated on every single
+        query, which is the `O(n^2 d)` cost that made A take 9x longer than B
+        in the ab-grid run. Nothing about the rebuild depends on the query, so
+        it only has to happen once per window; this hoists it out of the loop
+        and reuses it for every query tile, same as B's own batched path
+        reuses `k_hat`/`v_cent` across tiles.
+
+        Same per-term truncation order as `_accumulate_terms`'s dense branch
+        (`floor` before the sum over cached tokens, not after) so this is
+        bit-identical to `attend_two_pass`, not merely close -- pinned by
+        `check_causal_batch_dense_is_bit_identical`, the same guarantee
+        `check_causal_batch_is_bit_identical` gives B. `kchunk` bounds the
+        `(tile*heads, kchunk, d)` intermediate the per-term floor needs; it
+        only trades memory for python-loop overhead and changes no value.
+        """
+        if self.score_mode != "dense":
+            raise ValueError(
+                f"attend_causal_batch_dense inlines architecture A's decode-then-dot "
+                f"path; use attend_causal_batch for 'fused' (B)")
+        if self._q_unrot is None:
+            raise ValueError(
+                "architecture A scores in the original basis and needs the "
+                "pre-rotation query; the kernel supplies it before attending")
+        fmt = self.fmt
+        q = np.asarray(q_rot, dtype=INT)
+        if q.ndim == 2:
+            q = q[:, None, :]
+        n_q, heads, d = q.shape
+        n_tok = kv.k_idx.shape[0]
+        qu = np.asarray(self._q_unrot, dtype=INT).reshape(q.shape)
+
+        # Decode the whole cache once, exactly as `_scores_baseline` and the
+        # dense branch of `_accumulate_terms` decode it per call.
+        k_orig = self.z.rotation.inverse_apply(
+            rshift(self.z.key.codebook.centroids[kv.k_idx.astype(INT)]
+                   * kv.k_norm.astype(INT)[:, None],
+                   self.z.key.threshold_frac - fmt.qk_frac), trace, "unrotate")
+        v_orig = self.z.rotation.inverse_apply(
+            rshift(self.z.value.codebook.centroids[kv.v_idx.astype(INT)]
+                   * kv.v_norm.astype(INT)[:, None],
+                   self.z.value.threshold_frac - fmt.qk_frac), trace, "unrotate")
+        k_orig_f = k_orig.astype(np.float64)
+        v_orig_f = v_orig.astype(np.float64)
+        k_max = absmax(k_orig)
+        v_max = absmax(v_orig)
+
+        score_shift = 2 * fmt.qk_frac - fmt.acc_frac
+        acc_shift = fmt.prob_frac + fmt.qk_frac - fmt.acc_frac
+        acc_scale = 2.0 ** -acc_shift
+
+        out = np.empty((n_q, heads, d), dtype=INT)
+        stats = AttentionStats(n_tokens=n_tok)
+        positions = np.arange(n_tok)
+        self.baseline_calls += 1
+
+        for lo in range(0, n_q, tile):
+            hi = min(lo + tile, n_q)
+            nt = hi - lo
+
+            qt = qu[lo:hi].reshape(-1, d)
+            q_max = absmax(qt)
+            if q_max * k_max * d >= FLOAT64_EXACT:
+                raise OverflowError(
+                    f"score: |q|*|k_orig|*d = {q_max * k_max * d} >= 2^53")
+            dot_f = qt.astype(np.float64) @ k_orig_f.T          # exact, Q(2*qk_frac)
+            # A power-of-two rescale of an exact float64 integer is exact too.
+            s = np.floor(dot_f * (2.0 ** -score_shift)).astype(INT)
+            bias = self._bias_term(qt, n_tok)
+            if bias is not None:
+                s = s + bias
+            s, ovf, peak = self.score_q.check_and_clamp(s)
+            stats.score_overflows += ovf
+            stats.max_abs_score = max(stats.max_abs_score, peak)
+            s = s.reshape(nt, heads, n_tok)
+
+            valid = (positions[None, :] <= (base + np.arange(lo, hi))[:, None])
+            s = np.where(valid[:, None, :], s, self.score_q.lo)
+
+            m = s.max(axis=-1, keepdims=True)
+            p = self.exp(m - s)
+            l = p.sum(axis=-1)
+
+            pf = p.reshape(-1, n_tok).astype(np.float64)        # (nt*heads, T)
+            p_max = absmax(p)
+            if p_max * v_max >= FLOAT64_EXACT:
+                raise OverflowError(
+                    f"accumulate: |p|*|v_orig| = {p_max * v_max} >= 2^53")
+            if p_max * v_max * acc_scale * n_tok >= FLOAT64_EXACT:
+                raise OverflowError(
+                    f"accumulate: the reduction over {n_tok} tokens exceeds 2^53; "
+                    f"lower `tile` will not help"
+                )
+            # Each term is floored before it joins the sum -- see
+            # `_accumulate_terms` -- so this chunks over cached tokens purely to
+            # bound the `(nt*heads, kchunk, d)` intermediate. Chunking changes
+            # nothing about the value: floor-then-sum is the same regardless of
+            # which tokens land in which chunk.
+            acc = np.zeros((nt * heads, d), dtype=np.float64)
+            for klo in range(0, n_tok, kchunk):
+                khi = min(klo + kchunk, n_tok)
+                term = np.floor(pf[:, klo:khi, None] * acc_scale
+                                * v_orig_f[None, klo:khi, :])
+                acc += term.sum(axis=1)
+            acc, ovf, peak = self.acc_q.check_and_clamp(acc.astype(INT))
+            stats.acc_overflows += ovf
+            stats.max_abs_acc = max(stats.max_abs_acc, peak)
+            acc = acc.reshape(nt, heads, d)
+            out[lo:hi] = self._finalize(acc, l)
+
+        causal = heads * sum(base + i + 1 for i in range(n_q))
+        record(trace, Op.SCORE, "attention", m=d, n=causal)
+        record(trace, Op.SOFTMAX, "attention", m=1, n=n_q * heads)
+        record(trace, Op.ACCUMULATE, "attention", m=d, n=causal)
+        return out.reshape(np.shape(q_rot)), stats
+
+    def attend_online_batch(self, q_rot: np.ndarray, kv: CompressedKV,
+                            base: int = 0, trace: Trace | None = None
+                            ) -> tuple[np.ndarray, AttentionStats]:
+        """The online softmax over a whole prefill, one cached token per step.
+
+        This is what the hardware does: one pass over the cache carrying a
+        running maximum, rescaling the accumulator whenever that maximum moves.
+        `attend_online` already says this, but one query at a time, which works
+        out to O(n^2) Python iterations for a prefill and hours per window.
+
+        Here the loop runs over cached tokens and every query advances together.
+        A step is still exactly one cached token, so the sequence of rescale
+        events comes out identical to the per-query loop -- and with it the
+        truncation pattern, which is the entire reason the online and two-pass
+        forms differ at all. `check_online_batch_is_bit_identical` pins that.
+
+        Causality is handled by only admitting query `q` once the loop reaches
+        token `q`. Before that the token is in that query's future and must not
+        touch its running maximum.
+        """
+        if self.score_mode != "fused":
+            raise ValueError(
+                f"attend_online_batch inlines the fused value path and ignores score_mode; "
+                "architecture A would get its scores in the original basis and "
+                "its values in the rotated one, and the mixed-basis accumulator "
+                "would go through the unfolded W_o as plausible nonsense. Use "
+                "attend_two_pass for A.")
+        q = np.asarray(q_rot, dtype=INT)
+        if q.ndim == 2:
+            q = q[:, None, :]
+        n_q, heads, d = q.shape
+        n_tok = kv.k_idx.shape[0]
+
+        k_hat = self.z.key.codebook.centroids[kv.k_idx.astype(INT)]
+        dot = exact_int_matmul(q.reshape(-1, d), k_hat.T)
+        s = rshift(dot * kv.k_norm.astype(INT), self.score_shift)
+        bias = self._bias_term(q.reshape(-1, d), n_tok)
+        if bias is not None:
+            s = s + bias
+        ovf = self.score_q.overflow_count(s)
+        s = self.score_q.clamp(s).reshape(n_q, heads, n_tok)
+        stats = AttentionStats(n_tokens=n_tok, score_overflows=ovf,
+                               max_abs_score=absmax(s))
+
+        v_cent = self.z.value.codebook.centroids
+        v_hat = v_cent[kv.v_idx.astype(INT)]                    # (T, d)
+        v_norm = kv.v_norm.astype(INT)
+        unity = INT(1) << self.fmt.prob_frac
+
+        acc = np.zeros((n_q, heads, d), dtype=INT)
+        l = np.zeros((n_q, heads), dtype=INT)
+        m = np.full((n_q, heads), self.score_q.lo, dtype=INT)
+        q_index = base + np.arange(n_q)
+
+        for t in range(n_tok):
+            live = q_index >= t                    # queries this token is causal for
+            if not live.any():
+                break
+            st = np.where(live[:, None], s[:, :, t], m)
+
+            grew = st > m
+            if grew.any():
+                factor = np.where(grew, self.exp(np.maximum(st - m, 0)), unity)
+                acc = rshift(acc * factor[:, :, None], self.fmt.prob_frac)
+                l = rshift(l * factor, self.fmt.prob_frac)
+                m = np.where(grew, st, m)
+                stats.rescale_events += int(grew.sum())
+
+            p = np.where(live[:, None], self.exp(m - st), INT(0))
+            l = l + p
+            acc = acc + rshift((v_norm[t] * p)[:, :, None] * v_hat[t], self.acc_shift)
+            stats.acc_overflows += self.acc_q.overflow_count(acc)
+            acc = self.acc_q.clamp(acc)
+
+        stats.max_abs_acc = absmax(acc)
+        causal = heads * sum(base + i + 1 for i in range(n_q))
+        record(trace, Op.SCORE, "attention", m=d, n=causal)
+        record(trace, Op.SOFTMAX, "attention", m=1, n=n_q * heads)
+        record(trace, Op.ACCUMULATE, "attention", m=d, n=causal)
+        record(trace, Op.RESCALE, "attention", m=d, n=stats.rescale_events)
+        return self._finalize(acc, l).reshape(np.shape(q_rot)), stats
+
+    def _finalize(self, acc: np.ndarray, l: np.ndarray) -> np.ndarray:
+        """Divide by the softmax denominator, once per step rather than per token.
+
+        The shift is per row, because `reciprocal` normalises per row: two query
+        heads with different denominators get different shifts in the same step.
+        """
+        recip, shift = reciprocal(l, self.fmt)
+        return rshift(acc * recip[..., None], shift[..., None])

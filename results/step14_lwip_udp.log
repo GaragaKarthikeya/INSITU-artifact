@@ -1,0 +1,12 @@
+=== Llama 3.2 1B, all 16 layers on the ZCU104, over UDP/lwIP, no prefill ===
+The history of computing hardware spans centuries, from mechanical calculators to the modern-day desktop computer.
+
+prompt: 11 tokens in 7.1 s
+generate: 8 tokens in 5.8 s (722 ms/token wall)
+decode steps on the FPGA: 304 (16 layers x 19 tokens)
+  agreement with the host: 304 exact, 0 different
+  device time: 6.7 ms total, 22 us/step
+  wire time:   459 ms total, 1.5 ms/step (1.5% of it is the block)
+  scan: 272093 cycles, 19320 starving (7.10%)
+  clips 0, overflows 0, steps with a range/saturation flag 0
+  device time per TOKEN across all 16 layers: 354 us -> 2826 tok/s if transport were free

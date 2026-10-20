@@ -1,0 +1,18 @@
+=== Llama 3.2 1B, ALL 16 LAYERS' attention on the ZCU104, no prefill ===
+transport: JTAG mailbox (the slow path; Ethernet is unreliable, see plan.MD)
+  zeroed 16 x 131072 B of cache
+16 layers on the board, capacity 14, 131072 B each, 2.1 MB of DDR from 0x10000000
+feeding 11 prompt tokens through the pipeline (no prefill; the hardware writes every row)
+  ... 208 steps, every one traced ...
+
+The history of computing hardware spans centuries, from mechanical calculators to
+
+prompt: 11 tokens in 181.8 s
+generate: 2 tokens in 33.2 s (16591 ms/token wall)
+decode steps on the FPGA: 208 (16 layers x 13 tokens)
+  agreement with the host: 208 exact, 0 different
+  device time: 4.7 ms total, 22 us/step
+  wire time:   207882 ms total, 999.4 ms/step (0.0% of it is the block)
+  scan: 177991 cycles, 13150 starving (7.39%)
+  clips 0, overflows 0, steps with a range/saturation flag 0
+  device time per TOKEN across all 16 layers: 358 us -> 2796 tok/s if the transport were free

@@ -1,0 +1,34 @@
+# Step 15, perplexity at 4,096 tokens of WikiText-2.
+#
+# TRANSCRIBED FROM THE TERMINAL, not captured: ./scripts/attn tees the board's
+# UART to /tmp/attn.log and leaves the host's stdout on the terminal. Rerun with
+#   ./scripts/attn ppl --tokens 4096 --no-verify 2>&1 | tee results/<name>.log
+# to get a captured one.
+#
+# Run with --no-verify: the per-step comparison against the numpy kernel is OFF,
+# so the agreement line is absent. Bit-exactness is established to ctx 256
+# elsewhere, and to ctx 32 by the control run immediately before this one
+# (512 of 512 steps exact). Contexts 257..4,096 are unchecked.
+#
+# The board's own account: NET 37377 -> 107009 served, 0 dropped, which is
+# 65,536 decode steps + 4,352 CMD_LOAD chunks to the print interval.
+
+========================================================================
+baseline (fp32 attention, host)      perplexity    9.074
+compressed 4b/2b, FPGA                perplexity   10.640
+                                     ratio        1.1726
+========================================================================
+4096 tokens in 1749.8 s (427 ms/token wall)
+decode steps on the FPGA: 65536 (16 layers x 4096 tokens)
+  device time: 6727.8 ms total, 103 us/step
+  wire time:   101258 ms total, 1.5 ms/step (6.6% of it is the block)
+  scan: 1378662772 cycles, 36172674 starving (2.62%)
+  clips 0, overflows 0, steps with a range/saturation flag 0
+
+# Derived:
+#   rows scanned   1,074,003,968  (16 layers x 8 heads x sum 1..4096)
+#   cyc/row        1.284
+#   scan time      5.515 s at 250 MHz = 82% of device time
+#   read           55.85 GB at 10.13 GB/s
+#   per token      401 ms host (93.8%), 24.7 ms wire, 1.64 ms device
+#   with verify on the same run is an estimated 12.3 h -> 25x saved

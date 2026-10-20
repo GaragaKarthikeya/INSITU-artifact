@@ -1,0 +1,18 @@
+{
+  "title": "INSITU: Reconstruction-Free Attention over a Compressed KV Cache on FPGA",
+  "description": "Software and hardware artifact for INSITU: SystemVerilog attention engine for a Xilinx ZCU104, fixed-point NumPy reference, A53 firmware and host clients, golden vectors and tests, completed Llama-3.2-1B WikiText-2 bit-width sweep, and original board logs. The implemented cache uses four-bit keys and two-bit values. See docs/evidence.md for experiment protocols and limits of the archived measurements.",
+  "version": "1.0.0",
+  "upload_type": "software",
+  "access_right": "open",
+  "license": "mit",
+  "language": "eng",
+  "creators": [
+    {"name": "Garaga, Karthikeya", "affiliation": "International Institute of Information Technology Bangalore"},
+    {"name": "Gonuguntla, Lohith Prapoorna Chandra", "affiliation": "International Institute of Information Technology Bangalore"},
+    {"name": "Rao, Madhav", "affiliation": "International Institute of Information Technology Bangalore"}
+  ],
+  "keywords": ["FPGA", "attention", "KV cache", "quantization", "LLM inference", "Hadamard transform"],
+  "related_identifiers": [
+    {"identifier": "https://github.com/GaragaKarthikeya/INSITU-artifact", "relation": "isSupplementTo", "scheme": "url"}
+  ]
+}

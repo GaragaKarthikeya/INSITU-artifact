@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "Please cite this software when using the INSITU implementation or evaluation artifacts."
+type: software
+title: "INSITU: Reconstruction-Free Attention over a Compressed KV Cache on FPGA"
+version: 1.0.0
+license: MIT
+repository-code: "https://github.com/GaragaKarthikeya/INSITU-artifact"
+authors:
+  - family-names: Garaga
+    given-names: Karthikeya
+    affiliation: International Institute of Information Technology Bangalore
+  - family-names: Gonuguntla
+    given-names: Lohith Prapoorna Chandra
+    affiliation: International Institute of Information Technology Bangalore
+  - family-names: Rao
+    given-names: Madhav
+    affiliation: International Institute of Information Technology Bangalore
+keywords:
+  - FPGA
+  - attention
+  - KV cache
+  - quantization
+  - LLM inference
